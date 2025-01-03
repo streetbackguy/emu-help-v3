@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net481</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Helper</RootNamespace>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>lib\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.34.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="IndexRange" Version="1.0.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Irony">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveSplit.Core">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveSplit.ScriptableAutoSplit">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveSplit.View">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Workflow.Runtime" />
+  </ItemGroup>
+
+</Project>
