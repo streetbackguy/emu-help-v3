@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using Helper.Logging;
-using Helper.Common.MemoryUtils;
+using JHelper.Common.MemoryUtils;
 
 public class GameCube : GCN { }
 
@@ -32,10 +32,10 @@ public class GCN : HelperBase
     }
 
     internal override string[] ProcessNames { get; } =
-    {
+    [
         "Dolphin",
         "retroarch",
-    };
+    ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
     {

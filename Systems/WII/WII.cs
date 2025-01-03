@@ -1,8 +1,8 @@
-﻿using Helper.Common.MemoryUtils;
-using Helper.HelperBase;
+﻿using Helper.HelperBase;
 using Helper.Logging;
 using Helper.Wii;
 using Helper.Wii.Emulators;
+using JHelper.Common.MemoryUtils;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;

@@ -1,8 +1,8 @@
 ﻿// Defining the Make methods for creating memory watchers
 // to easily peek into the emulated games' memory
 
-using Helper.Common.Collections;
-using Helper.Common.MemoryUtils;
+using JHelper.Common.Collections;
+using JHelper.Common.MemoryUtils;
 
 namespace Helper.HelperBase;
 

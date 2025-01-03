@@ -1,5 +1,5 @@
-﻿using Helper.Common.MemoryUtils;
-using Helper.HelperBase;
+﻿using Helper.HelperBase;
+using JHelper.Common.MemoryUtils;
 using System;
 
 namespace Helper.GCN;

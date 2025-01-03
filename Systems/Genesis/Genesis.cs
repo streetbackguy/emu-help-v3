@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using Helper.Logging;
-using Helper.Common.MemoryUtils;
+using JHelper.Common.MemoryUtils;
 
 public class SegaGenesis : Genesis { }
 

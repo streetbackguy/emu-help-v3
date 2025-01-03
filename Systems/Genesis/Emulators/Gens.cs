@@ -1,7 +1,7 @@
 ﻿using System;
-using Helper.Common.ProcessInterop;
 using Helper.Logging;
-using Helper.Common.MemoryUtils;
+using JHelper.Common.MemoryUtils;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.Genesis.Emulators;
 

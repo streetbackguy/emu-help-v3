@@ -4,7 +4,7 @@
 // For convenience, the TryProcessHook method is run in every update loop,
 // but is returned immediately if the last execution time is less than 1.5 seconds before.
 
-using Helper.Common.ProcessInterop;
+using JHelper.Common.ProcessInterop;
 using Helper.LiveSplit;
 using Helper.Logging;
 using System;

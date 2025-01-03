@@ -1,4 +1,4 @@
-﻿using Helper.Common.MemoryUtils;
+﻿using JHelper.Common.MemoryUtils;
 using Helper.HelperBase;
 using System;
 

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Helper.Common.ProcessInterop;
-using Helper.Common.ProcessInterop.API;
 using Helper.Logging;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.GBA.Emulators;
 

@@ -1,6 +1,6 @@
 ﻿using System;
-using Helper.Common.ProcessInterop;
 using Helper.Logging;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.GBA.Emulators;
 

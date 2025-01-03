@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Helper.Common.ProcessInterop;
 using Helper.Logging;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.GBC.Emulators;
 
@@ -17,7 +17,7 @@ internal class GSR_qt : GBCEmulator
 
     public override bool FindRAM(ProcessMemory process)
     {
-        MemoryScanPattern target = new MemoryScanPattern(0, "20 ?? ?? ?? 20 ?? ?? ?? 20 ?? ?? ?? 20 ?? ?? ?? 05 00 00");
+        MemoryScanPattern target = new(0, "20 ?? ?? ?? 20 ?? ?? ?? 20 ?? ?? ?? 20 ?? ?? ?? 05 00 00");
 
         IntPtr ptr = process
             .MemoryPages

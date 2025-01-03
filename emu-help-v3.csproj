@@ -25,34 +25,47 @@
     </PackageReference>
     <PackageReference Include="IndexRange" Version="1.0.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Irony">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.Core">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.ScriptableAutoSplit">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.View">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Buffers">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Memory">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="System.Numerics.Vectors">
-      <HintPath>..\..\..\..\Program Files (x86)\LiveSplit\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Workflow.Runtime" />
+    <Reference Include="System.Workflow.Runtime">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 
 </Project>

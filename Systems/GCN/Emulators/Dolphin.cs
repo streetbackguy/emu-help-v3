@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Helper.Common.ProcessInterop;
-using Helper.Common.MemoryUtils;
 using Helper.Logging;
+using JHelper.Common.MemoryUtils;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.GCN.Emulators;
 

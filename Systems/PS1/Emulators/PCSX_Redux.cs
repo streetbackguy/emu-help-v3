@@ -1,7 +1,6 @@
 ﻿using System;
-using Helper.Common.ProcessInterop;
-using Helper.Common.ProcessInterop.API;
 using Helper.Logging;
+using JHelper.Common.ProcessInterop;
 
 namespace Helper.PS1.Emulators;
 
