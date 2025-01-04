@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 
 namespace Helper.LiveSplit;
@@ -23,13 +24,15 @@ public static class LiveSplitAssembly
     /// <returns>The loaded assembly, or null if loading fails.</returns>
     private static Assembly AssemblyResolve(object? sender, ResolveEventArgs e)
     {
-        string name = e.Name; // Get the requested assembly name
-        int i = name.IndexOf(',');
+        ReadOnlySpan<char> assemblyNameSpan = e.Name.AsSpan();
+        int index = assemblyNameSpan.IndexOf(',');
 
-        // If there is no comma in the name, return null
-        if (i == -1)
-            return null!;
+        if (index == -1)
+            throw new InvalidOperationException();
 
-        return Assembly.LoadFrom($"Components/{name[..i]}.dll");
+        ReadOnlySpan<char> name = assemblyNameSpan[..index];
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Components", $"{name.ToString()}.dll");
+
+        return Assembly.LoadFrom(path);
     }
 }

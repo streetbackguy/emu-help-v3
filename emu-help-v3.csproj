@@ -33,31 +33,31 @@
 
   <ItemGroup>
     <Reference Include="Irony">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.Core">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.ScriptableAutoSplit">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.View">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Buffers">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Memory">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>..\..\..\..\..\Program Files (x86)\LiveSplit\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LiveSplit\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">
