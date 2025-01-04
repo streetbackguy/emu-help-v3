@@ -27,7 +27,7 @@ internal class Retroarch : PS1Emulator
     {
         ProcessModule currentCore = _process.Modules.FirstOrDefault(m => supportedCores.Contains(m.ModuleName));
 
-        if (currentCore is null)
+        if (currentCore == default)
             return false;
 
         core_base_address = currentCore.BaseAddress;
