@@ -5,11 +5,13 @@
 // but is returned immediately if the last execution time is less than 1.5 seconds before.
 
 using JHelper.Common.ProcessInterop;
-using Helper.LiveSplit;
 using Helper.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
+#if LIVESPLIT
+using Helper.LiveSplit;
+#endif
 
 namespace Helper.HelperBase;
 
@@ -60,6 +62,7 @@ public abstract partial class HelperBase
 
         try
         {
+#if LIVESPLIT
             // Get the current game process from the Autosplitter
             Process process = Autosplitter.Game;
             string processName = process.ProcessName;
@@ -74,15 +77,18 @@ public abstract partial class HelperBase
             // If the current process is not valid or allowed, search for any allowed process
             else
             {
+#endif
                 ProcessMemory? _process = ProcessNames
-                    .Select(name => ProcessMemory.HookProcess(name))
+                    .Select(ProcessMemory.HookProcess)
                     .FirstOrDefault(p => p is not null);
 
                 if (_process is not null)
                     emulatorProcess = _process;
 
                 return;
+#if LIVESPLIT
             }
+#endif
         }
         catch
         {

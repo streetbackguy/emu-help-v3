@@ -2,9 +2,11 @@
 using Helper.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
+#pragma warning disable IDE1006
 internal class ePSXe : PS1Emulator
+#pragma warning restore IDE1006
 {
     internal ePSXe()
         : base()
@@ -14,7 +16,7 @@ internal class ePSXe : PS1Emulator
 
     public override bool FindRAM(ProcessMemory process)
     {
-        IntPtr ptr = process.Scan(new MemoryScanPattern(5, "C1 E1 10 8D 89") { OnFound = addr => process.ReadPointer(addr) });
+        IntPtr ptr = process.MainModule.Scan(new MemoryScanPattern(5, "C1 E1 10 8D 89") { OnFound = process.ReadPointer });
         
         if (ptr == IntPtr.Zero)
             return false;
@@ -25,8 +27,5 @@ internal class ePSXe : PS1Emulator
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory _)
-    {
-        return true;
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

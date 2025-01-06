@@ -3,9 +3,11 @@ using System.Linq;
 using Helper.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
+#pragma warning disable IDE1006
 internal class pSX : PS1Emulator
+#pragma warning restore IDE1006
 {
     internal pSX()
     : base()
@@ -38,8 +40,5 @@ internal class pSX : PS1Emulator
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory _)
-    {
-        return true;
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

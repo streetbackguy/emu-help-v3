@@ -20,10 +20,14 @@ public class PS2 : HelperBase
     }
 
     public PS2()
+#if LIVESPLIT
         : this(true) { }
 
     public PS2(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => PS2 Helper started");
     }

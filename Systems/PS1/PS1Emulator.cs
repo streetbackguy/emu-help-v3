@@ -1,7 +1,7 @@
 ﻿using Helper.HelperBase;
 using System;
 
-namespace Helper.PS1;
+namespace Helper.Systems.PS1;
 
 public abstract class PS1Emulator : Emulator
 {

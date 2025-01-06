@@ -1,6 +1,8 @@
 ﻿// Defining the Make methods for creating memory watchers
 // to easily peek into the emulated games' memory
 
+using System.Collections.Generic;
+using Helper.HelperBase.Collections;
 using JHelper.Common.Collections;
 using JHelper.Common.MemoryUtils;
 
@@ -55,5 +57,24 @@ public abstract partial class HelperBase
     public virtual LazyWatcher<string> MakeString(uint maxLength, ulong baseAddress, params int[] offsets)
     {
         return new LazyWatcher<string>(_tickCounter, string.Empty, (_, _) => this.ReadString(maxLength, baseAddress, offsets));
+    }
+
+
+    private WatcherDictionary _watchers = new();
+
+    public dynamic this[string name]
+    {
+        get
+        {
+            if (!_watchers.TryGetValue(name, out var value))
+                throw new KeyNotFoundException($"No watcher was found with the following name: {name}");
+
+            return value;
+        }
+
+        set
+        {
+            _watchers[name] = value;
+        }
     }
 }

@@ -2,6 +2,7 @@
 // asl-help is licensed under GPL-3.0.
 // See: https://github.com/just-ero/asl-help
 
+#if LIVESPLIT
 using Helper.Logging;
 using LiveSplit.ASL;
 using System;
@@ -118,3 +119,4 @@ internal class Actions
         }
     }
 }
+#endif

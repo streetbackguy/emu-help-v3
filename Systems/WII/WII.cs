@@ -23,10 +23,14 @@ public class WII : HelperBase
     }
 
     public WII()
+#if LIVESPLIT
         : this(true) { }
 
     public WII(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => Wii Helper started");
     }

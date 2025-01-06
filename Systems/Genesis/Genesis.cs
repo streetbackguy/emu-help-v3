@@ -23,10 +23,14 @@ public class Genesis : HelperBase
     }
 
     public Genesis()
+#if LIVESPLIT
         : this(true) { }
 
     public Genesis(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => SEGA Genesis Helper started");
     }

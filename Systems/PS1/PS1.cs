@@ -1,7 +1,7 @@
 ﻿using Helper.HelperBase;
 using Helper.Logging;
-using Helper.PS1;
-using Helper.PS1.Emulators;
+using Helper.Systems.PS1;
+using Helper.Systems.PS1.Emulators;
 using System;
 
 public class Playstation : PS1 { }
@@ -24,10 +24,14 @@ public class PS1 : HelperBase
     }
 
     public PS1()
+#if LIVESPLIT
         : this(true) { }
 
     public PS1(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => PS1 Helper started");
     }

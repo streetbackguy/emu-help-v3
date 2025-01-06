@@ -2,14 +2,14 @@
 using Helper.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
 internal class PCSXRedux : PS1Emulator
 {
     private IntPtr addr_base, addr;
 
     internal PCSXRedux()
-    : base()
+        : base()
     {
         Log.Info("  => Attached to emulator: PCSX Redux");
     }
@@ -67,8 +67,5 @@ internal class PCSXRedux : PS1Emulator
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory process)
-    {
-        return process.Read(addr_base, out IntPtr ptr) && ptr == addr;
-    }
+    public override bool KeepAlive(ProcessMemory process) => process.Read(addr_base, out IntPtr ptr) && ptr == addr;
 }

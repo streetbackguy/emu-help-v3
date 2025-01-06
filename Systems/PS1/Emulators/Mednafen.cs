@@ -2,12 +2,12 @@
 using JHelper.Common.ProcessInterop;
 using System;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
 internal class Mednafen : PS1Emulator
 {
     internal Mednafen()
-    : base()
+        : base()
     {
         Log.Info("  => Attached to emulator: Mednafen");
     }
@@ -28,8 +28,5 @@ internal class Mednafen : PS1Emulator
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory _)
-    {
-        return true;
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

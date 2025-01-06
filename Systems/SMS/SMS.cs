@@ -20,10 +20,14 @@ public class SMS : HelperBase
     }
 
     public SMS()
+#if LIVESPLIT
         : this(true) { }
 
     public SMS(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => SEGA Master System - Helper started");
     }

@@ -23,10 +23,14 @@ public class GCN : HelperBase
     }
 
     public GCN()
+#if LIVESPLIT
         : this(true) { }
 
     public GCN(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => GCN Helper started");
     }

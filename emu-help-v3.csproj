@@ -7,14 +7,24 @@
     <RootNamespace>Helper</RootNamespace>
     <Nullable>enable</Nullable>
     <BaseOutputPath>lib\</BaseOutputPath>
+    <Configurations>Livesplit;Generic</Configurations>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Livesplit|AnyCPU'">
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
+    <DefineConstants>$(DefineConstants);LIVESPLIT</DefineConstants>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Generic|AnyCPU'">
+    <Optimize>True</Optimize>
+    <DebugType>none</DebugType>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,10 +54,6 @@
     </Reference>
     <Reference Include="System.Memory">
       <HintPath>C:\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Program Files (x86)\LiveSplit\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

@@ -7,14 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "emu-help-v3", "emu-help-v3.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Generic|Any CPU = Generic|Any CPU
+		Livesplit|Any CPU = Livesplit|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Generic|Any CPU.ActiveCfg = Generic|Any CPU
+		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Generic|Any CPU.Build.0 = Generic|Any CPU
+		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Livesplit|Any CPU.ActiveCfg = Livesplit|Any CPU
+		{21223220-7A12-4C57-9AC4-BA4277FF4220}.Livesplit|Any CPU.Build.0 = Livesplit|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

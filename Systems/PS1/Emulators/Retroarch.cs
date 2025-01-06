@@ -3,7 +3,7 @@ using System.Linq;
 using Helper.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
 internal class Retroarch : PS1Emulator
 {

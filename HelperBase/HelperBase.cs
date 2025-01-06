@@ -1,6 +1,8 @@
 ﻿using System;
-using Helper.LiveSplit;
 using Helper.Logging;
+#if LIVESPLIT
+using Helper.LiveSplit;
+#endif
 
 namespace Helper.HelperBase;
 
@@ -11,24 +13,33 @@ namespace Helper.HelperBase;
 /// </summary>
 public abstract partial class HelperBase : IDisposable
 {
-    protected readonly bool isASLCodeGenerating;
+#if LIVESPLIT
+    private readonly bool isASLCodeGenerating;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HelperBase"/> class with code generation enabled by default.
     /// </summary>
     public HelperBase()
         : this(true) { }
+#endif
 
+#if LIVESPLIT
     /// <summary>
     /// Initializes a new instance of the <see cref="HelperBase"/> class, optionally enabling code generation.
     /// Code generation should be disabled if the helper is used in more advanced .asl scripts.
     /// </summary>
     /// <param name="generateCode">A boolean indicating whether code generation is enabled.</param>
     public HelperBase(bool generateCode)
+#else
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HelperBase"/> class
+    /// </summary>
+    public HelperBase()
+#endif
     {
+#if LIVESPLIT
         // Subscribe to the AssemblyResolve event to handle dynamic assembly loading
         LiveSplitAssembly.AssemblyResolveSubscribe();
-
         try
         {
             isASLCodeGenerating = generateCode;
@@ -45,26 +56,29 @@ public abstract partial class HelperBase : IDisposable
                 Log.Info("Loading emu-help...");
                 Log.Info("  => Generating code...");
 
-                Autosplitter.Vars["Helper"] = this;
-                Log.Info("    => Set helper to vars.Helper.");
-
-                Autosplitter.Actions.Update.Prepend("if (!vars.Helper.Update()) return false;");
-                Autosplitter.Actions.Shutdown.Append("vars.Helper.Dispose();");
-                Autosplitter.Actions.Exit.Append("vars.Helper.Exit();");
+                string helperName = "Helper";
+                Autosplitter.Vars[helperName] = this;
+                Log.Info($"    => Set helper to vars.{helperName}.");
+                Autosplitter.Actions.Update.Prepend($"if (!vars.{helperName}.Update()) return false;");
+                Autosplitter.Actions.Shutdown.Append($"vars.{helperName}.Dispose();");
+                Autosplitter.Actions.Exit.Append($"vars.{helperName}.Exit();");
             }
             else
             {
                 // Log messages when code generation is disabled
+#endif
                 Log.Welcome();
                 Log.Info();
                 Log.Info("Loading helper...");
+#if LIVESPLIT
             }
         }
         finally
         {
-            // Unsubscribe from the AssemblyResolve event to prevent memory leaks
+            // Unsubscribe from the AssemblyResolve event
             LiveSplitAssembly.AssemblyResolveUnsubscribe();
         }
+#endif
     }
 
     /// <summary>
@@ -117,6 +131,15 @@ public abstract partial class HelperBase : IDisposable
             }
 
             _tickCounter.Tick();
+
+#if LIVESPLIT
+            if (isASLCodeGenerating)
+            {
+                _watchers.UpdateAll();
+                foreach (var entry in _watchers)
+                    Autosplitter.Current[entry.Key] = ((dynamic)entry.Value).Current;
+            }
+#endif
 
             // Return true indicating a successful update
             return true;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if LIVESPLIT
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -24,15 +25,10 @@ public static class LiveSplitAssembly
     /// <returns>The loaded assembly, or null if loading fails.</returns>
     private static Assembly AssemblyResolve(object? sender, ResolveEventArgs e)
     {
-        ReadOnlySpan<char> assemblyNameSpan = e.Name.AsSpan();
-        int index = assemblyNameSpan.IndexOf(',');
-
+        int index = e.Name.IndexOf(',');
         if (index == -1)
             throw new InvalidOperationException();
-
-        ReadOnlySpan<char> name = assemblyNameSpan[..index];
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Components", $"{name.ToString()}.dll");
-
-        return Assembly.LoadFrom(path);
+        return Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Components", $"{e.Name[..index]}.dll"));
     }
 }
+#endif

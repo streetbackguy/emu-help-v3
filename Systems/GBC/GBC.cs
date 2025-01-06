@@ -24,10 +24,14 @@ public class GBC : HelperBase
     }
 
     public GBC()
+#if LIVESPLIT
         : this(true) { }
 
     public GBC(bool generateCode)
         : base(generateCode)
+#else
+        : base()
+#endif
     {
         Log.Info("  => GBC Helper started");
     }

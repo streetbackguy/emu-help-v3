@@ -2,14 +2,14 @@
 using JHelper.Common.ProcessInterop;
 using System;
 
-namespace Helper.PS1.Emulators;
+namespace Helper.Systems.PS1.Emulators;
 
 internal class Duckstation : PS1Emulator
 {
-    private IntPtr ramPointer;
+    private IntPtr ramPointer = IntPtr.Zero;
 
     internal Duckstation()
-    : base()
+        : base()
     {
         Log.Info("  => Attached to emulator: Duckstation");
     }
@@ -19,6 +19,12 @@ internal class Duckstation : PS1Emulator
         if (!_process.Is64Bit)
             return false;
 
+        // If the ramPointer value has been already found, there
+        // is no need for the more complex memory stuff below
+        if (ramPointer != IntPtr.Zero)
+            return true;
+
+        // Evaluate and calculate the value of the main pointer to WRAM
         if (_process.MainModule.Symbols.TryGetValue("RAM", out IntPtr symbol))
         {
             ramPointer = symbol;

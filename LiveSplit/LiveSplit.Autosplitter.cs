@@ -2,6 +2,7 @@
 // asl-help is licensed under GPL-3.0.
 // See: https://github.com/just-ero/asl-help
 
+#if LIVESPLIT
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
@@ -11,7 +12,6 @@ using System.Reflection;
 using Irony.Parsing;
 using LiveSplit.ASL;
 using LiveSplit.UI.Components;
-using Helper.Common.Reflection;
 
 namespace Helper.LiveSplit;
 
@@ -39,7 +39,7 @@ internal static class Autosplitter
     /// <summary>
     /// Gets the <see cref="Process"/> currently hooked by <see cref="LiveSplit"/>.
     /// </summary>
-    public static Process Game => ASLScript.GetFieldValue<Process>("_game");
+    public static Process Game => (Process)ASLScript.GetType().GetField("_game", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(ASLScript);
 
     /// <summary>
     /// The <see langword="vars"/> <see cref="ExpandoObject"/> used inside an autosplitter .asl.
@@ -69,29 +69,26 @@ internal static class Autosplitter
             .First(decl => decl is not null && decl.Name == "CompiledScript")
             .Assembly;
 
-        // Get the ASLComponent instances from the LiveSplit timer layout.
-        IEnumerable<ASLComponent> components = Timer.Layout.Components
+        // Find the relevant components based on the compiled script assembly.
+        (ASLScript, Vars, ASLMethods, ComponentSettings settings) = Timer.Layout.Components
             .Prepend(Timer.Run.AutoSplitter?.Component)
-            .OfType<ASLComponent>();
-
-        // Find the relevant ASLComponent based on the compiled script assembly.
-        ASLComponent aslComponent = components.FirstOrDefault(component =>
-        {
-            ASLScript script = component.Script;
-            ASLScript.Methods methods = script.GetFieldValue<ASLScript.Methods>("_methods");
-
-            return !methods.startup.IsEmpty &&
-                methods.startup.GetFieldValue<object>("_compiled_code").GetType().Assembly == compiledScriptAssembly;
-        });
-
-        // Initialize properties with the ASL script and its methods.
-        ASLScript = aslComponent.Script;
-        Vars = ASLScript.Vars;
-        ASLMethods = ASLScript.GetFieldValue<ASLScript.Methods>("_methods");
-        Actions = new Actions();
+            .OfType<ASLComponent>()
+            .Select(component => (
+                component.Script,
+                component.Script.Vars,
+                (ASLScript.Methods) component.Script.GetType().GetField("_methods", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(component.Script),
+                (ComponentSettings) component.GetType().GetField("_settings", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(component))
+            )
+            .First(tuple => !tuple.Item3.startup.IsEmpty
+                && tuple.Item3.startup
+                    .GetType()
+                    .GetField("_compiled_code", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(tuple.Item3.startup)
+                    .GetType()
+                    .Assembly == compiledScriptAssembly
+            );
 
         // Load the ASL script file for parsing.
-        ComponentSettings settings = aslComponent.GetFieldValue<ComponentSettings>("_settings");
         string path = settings.ScriptPath;
         string code = File.ReadAllText(path);
 
@@ -101,7 +98,9 @@ internal static class Autosplitter
         ParseTree tree = parser.Parse(code);
         ParseTreeNode methodsNode = tree.Root.ChildNodes.First(n => n.Term.Name == "methodList");
 
+
         // Iterate through the parsed methods and store their information in the Actions instance.
+        Actions = new Actions();
         foreach (ParseTreeNode method in methodsNode.ChildNodes[0].ChildNodes)
         {
             // Extract the method name and body from the parse tree.
@@ -147,3 +146,4 @@ internal static class ASLMethodNames
     public const string OnSplit = "onSplit";
     public const string OnReset = "onReset";
 }
+#endif
