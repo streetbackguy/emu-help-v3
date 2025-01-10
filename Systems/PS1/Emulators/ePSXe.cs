@@ -1,8 +1,8 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Systems.PS1.Emulators;
+namespace EmuHelp.Systems.PS1.Emulators;
 
 #pragma warning disable IDE1006
 internal class ePSXe : PS1Emulator

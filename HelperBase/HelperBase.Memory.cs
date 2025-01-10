@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Helper.HelperBase;
+namespace EmuHelp.HelperBase;
 
 public abstract partial class HelperBase
 {

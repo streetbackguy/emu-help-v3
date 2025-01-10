@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
-using Helper.Logging;
-using Helper.Systems.PS1;
-using Helper.Systems.PS1.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Logging;
+using EmuHelp.Systems.PS1;
+using EmuHelp.Systems.PS1.Emulators;
 using System;
 
 public class Playstation : PS1 { }
@@ -38,14 +38,14 @@ public class PS1 : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "ePSXe",
-        "psxfin",
+        "ePSXe.exe",
+        "psxfin.exe",
         "duckstation-qt-x64-ReleaseLTCG.exe",
         "duckstation-nogui-x64-ReleaseLTCG.exe",
         "retroarch.exe",
         "pcsx-redux.main",
-        "XEBRA",
-        "mednafen",
+        "XEBRA.EXE",
+        "mednafen.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -76,13 +76,13 @@ public class PS1 : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "ePSXe" => new ePSXe(),
+            "ePSXe.exe" => new ePSXe(),
             "duckstation-qt-x64-ReleaseLTCG.exe" or "duckstation-nogui-x64-ReleaseLTCG.exe" => new Duckstation(),
-            "mednafen" => new Mednafen(),
+            "mednafen.exe" => new Mednafen(),
             "pcsx-redux.main" => new PCSXRedux(),
-            "psxfin" => new pSX(),
+            "psxfin.exe" => new pSX(),
             "retroarch.exe" => new Retroarch(),
-            "XEBRA" => new Xebra(),
+            "XEBRA.EXE" => new Xebra(),
             _ => null,
         };
     }

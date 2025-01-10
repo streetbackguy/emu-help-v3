@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.SMS.Emulators;
+namespace EmuHelp.Systems.SMS.Emulators;
 
 internal class BlastEm : SMSEmulator
 {
@@ -13,13 +13,13 @@ internal class BlastEm : SMSEmulator
         Log.Info("  => Attached to emulator: BlastEm");
     }
 
-    public override bool FindRAM(ProcessMemory _process)
+    public override bool FindRAM(ProcessMemory process)
     {
         IntPtr ptr = IntPtr.Zero;
-        var target = new MemoryScanPattern(10, "66 81 E1 FF 1F 0F B7 C9 8A 89 ?? ?? ?? ?? C3") { OnFound = addr => _process.ReadPointer(addr) };
+        MemoryScanPattern target = new MemoryScanPattern(10, "66 81 E1 FF 1F 0F B7 C9 8A 89 ?? ?? ?? ?? C3") { OnFound = process.ReadPointer };
 
-        ptr = _process.MemoryPages.Where(p => p.RegionSize == 0x10100)
-            .Select(p => _process.Scan(target, p.BaseAddress, (int)p.RegionSize))
+        ptr = process.MemoryPages.Where(p => p.RegionSize == 0x101000)
+            .Select(p => process.Scan(target, p.BaseAddress, (int)p.RegionSize))
             .FirstOrDefault(p => p != IntPtr.Zero);
 
         if (ptr == IntPtr.Zero)
@@ -31,8 +31,5 @@ internal class BlastEm : SMSEmulator
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory _)
-    {
-        return true;
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

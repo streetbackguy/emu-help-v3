@@ -1,8 +1,8 @@
-﻿using Helper.HelperBase;
-using Helper.GBC;
-using Helper.GBC.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Systems.GBC;
+using EmuHelp.Systems.GBC.Emulators;
 using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 
 public class GameBoyColor : GBC { }
 
@@ -38,9 +38,9 @@ public class GBC : HelperBase
 
     internal override string[] ProcessNames { get; } =
     {
-        "GSR",
-        "GSE",
-        "gambatte_speedrun"
+        "GSR.exe",
+        "GSE.exe",
+        "gambatte_speedrun.exe"
     };
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -73,8 +73,8 @@ public class GBC : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "GSR" or "GSE" => new GSR(),
-            "gambatte_speedrun" => new GSR_qt(),
+            "GSR.exe" or "GSE.exe" => new GSR(),
+            "gambatte_speedrun.exe" => new GSR_qt(),
             _ => null,
         };
     }

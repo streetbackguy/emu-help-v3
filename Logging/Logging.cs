@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Helper.Logging;
+namespace EmuHelp.Logging;
 
 /// <summary>
 /// The <see cref="Log"/> class provides static methods for logging messages.
@@ -34,7 +34,7 @@ internal static class Log
     If you would like to opt out of code generation, please use the following code in 'startup {}' instead.
     Make sure to call GetType() with the name of the specific helper you would like to use:
 
-        var type = Assembly.Load(File.ReadAllBytes("Components/emu-asl")).GetType("PS1");
+        var type = Assembly.Load(File.ReadAllBytes("Components/emu-help-v3")).GetType("PS1");
         vars.Helper = Activator.CreateInstance(type, args: false);
 
     If you have any questions, please tag Jujstme in the #auto-splitters channel

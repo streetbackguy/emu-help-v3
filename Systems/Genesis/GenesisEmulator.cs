@@ -1,8 +1,8 @@
 ﻿using JHelper.Common.MemoryUtils;
-using Helper.HelperBase;
+using EmuHelp.HelperBase;
 using System;
 
-namespace Helper.Genesis;
+namespace EmuHelp.Systems.Genesis;
 
 public abstract class GenesisEmulator : Emulator
 {

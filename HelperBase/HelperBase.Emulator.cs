@@ -1,6 +1,6 @@
 ﻿using JHelper.Common.ProcessInterop;
 
-namespace Helper.HelperBase;
+namespace EmuHelp.HelperBase;
 
 /// <summary>
 /// Abstract base class for emulators that manage 

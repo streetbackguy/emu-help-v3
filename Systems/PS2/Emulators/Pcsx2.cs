@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.PS2.Emulators;
+namespace EmuHelp.Systems.PS2.Emulators;
 
 internal class Pcsx2 : PS2Emulator
 {
     private IntPtr addr_base;
 
     internal Pcsx2()
-    : base()
+        : base()
     {
         Log.Info("  => Attached to emulator: PCSX2");
     }
@@ -29,16 +29,12 @@ internal class Pcsx2 : PS2Emulator
         }
         else
         {
-            MemoryScanPattern[] patterns =
-            [
-                new(2, "8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = addr => _process.ReadPointer(addr) },
-                new(2, "8B ?? ?? ?? ?? ?? 81 ?? F0 3F 00 00") { OnFound = addr => _process.ReadPointer(addr) },
-            ];
-
-
-            addr_base = patterns
-                .Select(pattern => _process.Scan(pattern, _process.MainModule.BaseAddress, _process.MainModule.ModuleMemorySize))
-                .FirstOrDefault(addr => addr != IntPtr.Zero);
+            addr_base = new MemoryScanPattern[]
+            {
+                new(2, "8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = _process.ReadPointer },
+                new(2, "8B ?? ?? ?? ?? ?? 81 ?? F0 3F 00 00") { OnFound = _process.ReadPointer },
+            }
+            .Select(_process.Scan).FirstOrDefault(addr => addr != IntPtr.Zero);
 
             if (addr_base == IntPtr.Zero)
                 return false;

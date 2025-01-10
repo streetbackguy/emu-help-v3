@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using System;
 
-namespace Helper.PS2;
+namespace EmuHelp.Systems.PS2;
 
 public abstract class PS2Emulator : Emulator
 {

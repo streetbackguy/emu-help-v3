@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
-using Helper.Logging;
-using Helper.PS2;
-using Helper.PS2.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Logging;
+using EmuHelp.Systems.PS2;
+using EmuHelp.Systems.PS2.Emulators;
 using System;
 
 public class Playstation2 : PS2 { }
@@ -34,12 +34,12 @@ public class PS2 : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "pcsx2x64",
-        "pcsx2-qt",
-        "pcsx2x64-avx2",
-        "pcsx2-avx2",
-        "pcsx2",
-        "retroarch",
+        "pcsx2x64.exe",
+        "pcsx2-qt.exe",
+        "pcsx2x64-avx2.exe",
+        "pcsx2-avx2.exe",
+        "pcsx2.exe",
+        "retroarch.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -70,8 +70,8 @@ public class PS2 : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "pcsx2x64" or "pcsx2-qt" or "pcsx2x64-avx2" or "pcsx2-avx2" or "pcsx2" => new Pcsx2(),
-            "retroarch" => new Retroarch(),
+            "pcsx2x64.exe" or "pcsx2-qt.exe" or "pcsx2x64-avx2.exe" or "pcsx2-avx2.exe" or "pcsx2.exe" => new Pcsx2(),
+            "retroarch.exe" => new Retroarch(),
             _ => null,
         };
     }

@@ -1,10 +1,9 @@
-﻿using Helper.HelperBase;
-using Helper.Genesis;
-using Helper.Genesis.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Systems.Genesis;
+using EmuHelp.Systems.Genesis.Emulators;
 using System;
-using System.Buffers;
 using System.Runtime.InteropServices;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 
 public class SegaGenesis : Genesis { }
@@ -37,12 +36,12 @@ public class Genesis : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "retroarch",
-        "SEGAGameRoom",
-        "SEGAGenesisClassics",
-        "Fusion",
-        "gens",
-        "blastem",
+        "retroarch.exe",
+        "SEGAGameRoom.exe",
+        "SEGAGenesisClassics.exe",
+        "Fusion.exe",
+        "gens.exe",
+        "blastem.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -78,11 +77,11 @@ public class Genesis : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "retroarch" => new Retroarch(),
-            "SEGAGameRoom" or "SEGAGenesisClassics" => new SegaClassics(),
-            "Fusion" => new Fusion(),
-            "gens" => new Gens(),
-            "blastem" => new BlastEm(),
+            "retroarch.exe" => new Retroarch(),
+            "SEGAGameRoom.exe" or "SEGAGenesisClassics.exe" => new SegaClassics(),
+            "Fusion.exe" => new Fusion(),
+            "gens.exe" => new Gens(),
+            "blastem.exe" => new BlastEm(),
             _ => null,
         };
     }
@@ -100,45 +99,40 @@ public class Genesis : HelperBase
         if (!ResolvePath(out IntPtr realAddress, alignedAddress))
             return false;
 
-        int size = Marshal.SizeOf<T>();
-
-        byte[]? rented = null;
-        Span<byte> buffer = size <= 1022
-            ? stackalloc byte[size + 2]
-            : (rented = ArrayPool<byte>.Shared.Rent(size + 2));
-
-        int shift = (size + misalignment) % 2;
-
-        Span<byte> newBuf = buffer[(misalignment ^ 1)..][..(size + misalignment + shift)];
-
-        bool success = emulatorProcess.ReadArray(realAddress, newBuf);
-
-        if (!success)
-        {
-            if (rented is not null)
-                ArrayPool<byte>.Shared.Return(rented);
-
-            return false;
-        }
-
-        if (Genesisemulator.Endianness == Endianness.Little)
-        {
-            for (int i = 0; i < newBuf.Length; i += 2)
-                newBuf[i..(i + 2)].Reverse();
-        }
-
-        buffer[1..(1 + size)].Reverse();
-
+        int size;
         unsafe
         {
-            fixed (byte* ptr = buffer)
-            {
-                value = *(T*)(ptr + 1);
-            }
+            size = sizeof(T);
         }
 
-        if (rented is not null)
-            ArrayPool<byte>.Shared.Return(rented);
+        using (ArrayRental<byte> buffer = size <= 1022 ? new ArrayRental<byte>(stackalloc byte[size + 2]) : new ArrayRental<byte>(size +2))
+        {
+            int shift = (size + misalignment) % 2;
+
+            Span<byte> newBuf = buffer.Span[(misalignment ^ 1)..][..(size + misalignment + shift)];
+
+            bool success = emulatorProcess.ReadArray(realAddress, newBuf);
+
+            if (!success)
+                return false;
+
+            if (Genesisemulator.Endianness == Endianness.Little)
+            {
+                for (int i = 0; i < newBuf.Length; i += 2)
+                    newBuf[i..(i + 2)].Reverse();
+            }
+
+            buffer.Span[1..(1 + size)].Reverse();
+
+            unsafe
+            {
+                fixed (byte* ptr = buffer.Span)
+                {
+                    value = *(T*)(ptr + 1);
+                }
+            }
+
+        }
 
         return true;
     }
@@ -160,41 +154,41 @@ public class Genesis : HelperBase
             return false;
         }
 
-        int sizeofT = Marshal.SizeOf<T>();
+        int sizeofT;
+        unsafe
+        {
+            sizeofT = sizeof(T);
+        }
+
         int size = sizeofT * (int)arraySize;
 
-        byte[]? rented = null;
-        Span<byte> buffer = size <= 1022
-            ? stackalloc byte[size + 2]
-            : (rented = ArrayPool<byte>.Shared.Rent(size + 2));
-
-        int shift = (size + misalignment) % 2;
-        Span<byte> newBuf = buffer[(misalignment ^ 1)..][..(size + misalignment + shift)];
-        bool success = emulatorProcess.ReadArray(realAddress, newBuf);
-
-        if (!success)
+        using (ArrayRental<byte> buffer = size <= 1022 ? new(stackalloc byte[size +2]) : new(size + 2))
         {
-            if (rented is not null)
-                ArrayPool<byte>.Shared.Return(rented);
-            value = new T[arraySize];
-            return false;
+
+            int shift = (size + misalignment) % 2;
+            Span<byte> newBuf = buffer.Span[(misalignment ^ 1)..][..(size + misalignment + shift)];
+            bool success = emulatorProcess.ReadArray(realAddress, newBuf);
+
+            if (!success)
+            {
+                value = new T[arraySize];
+                return false;
+            }
+
+            if (Genesisemulator.Endianness == Endianness.Little)
+            {
+                for (int i = 0; i < newBuf.Length; i += 2)
+                    newBuf[i..(i + 2)].Reverse();
+            }
+
+            for (int i = 0; i < arraySize; i++)
+            {
+                buffer.Span[1..][(i * sizeofT)..][..sizeofT].Reverse();
+            }
+
+            value = MemoryMarshal.Cast<byte, T>(buffer.Span[1..][..size]).ToArray();
         }
 
-        if (Genesisemulator.Endianness == Endianness.Little)
-        {
-            for (int i = 0; i < newBuf.Length; i += 2)
-                newBuf[i..(i + 2)].Reverse();
-        }
-
-        for (int i = 0; i < arraySize; i++)
-        {
-            buffer[1..][(i * sizeofT)..][..sizeofT].Reverse();
-        }
-
-        value = MemoryMarshal.Cast<byte, T>(buffer[1..][..size]).ToArray();
-
-        if (rented is not null)
-            ArrayPool<byte>.Shared.Return(rented);
         return true;
     }
 
@@ -213,49 +207,41 @@ public class Genesis : HelperBase
 
         int size = (int)stringSize * 2;
 
-        byte[]? rented = null;
-        Span<byte> buffer = size <= 1022
-            ? stackalloc byte[size + 2]
-            : (rented = ArrayPool<byte>.Shared.Rent(size + 2));
-
-        int shift = (size + misalignment) % 2;
-        Span<byte> newBuf = buffer[(misalignment ^ 1)..][..(size + misalignment + shift)];
-        bool success = emulatorProcess.ReadArray(realAddress, newBuf);
-
-        if (!success)
+        using (ArrayRental<byte> buffer = size <= 1022 ? new(stackalloc byte[size + 2]) : new(size + 2))
         {
-            if (rented is not null)
-                ArrayPool<byte>.Shared.Return(rented);
-            return false;
-        }
+            int shift = (size + misalignment) % 2;
+            Span<byte> newBuf = buffer.Span[(misalignment ^ 1)..][..(size + misalignment + shift)];
+            bool success = emulatorProcess.ReadArray(realAddress, newBuf);
 
-        if (Genesisemulator.Endianness == Endianness.Little)
-        {
-            for (int i = 0; i < newBuf.Length; i += 2)
-                newBuf[i..(i + 2)].Reverse();
-        }
+            if (!success)
+                return false;
 
-        if (stringSize >= 2 && buffer[1..] is [> 0, 0, > 0, 0, ..])
-        {
-            Span<char> charBuffer = MemoryMarshal.Cast<byte, char>(buffer[1..]);
-            int length = charBuffer[..(int)stringSize].IndexOf('\0');
-            value = length == -1 ? charBuffer[..(int)stringSize].ToString() : buffer[1..][..(int)stringSize][..length].ToString();
-        }
-        else
-        {
-            int length = buffer[1..][..(int)stringSize].IndexOf((byte)0);
-
-            unsafe
+            if (Genesisemulator.Endianness == Endianness.Little)
             {
-                fixed (byte* pBuffer = buffer[1..])
+                for (int i = 0; i < newBuf.Length; i += 2)
+                    newBuf[i..(i + 2)].Reverse();
+            }
+
+            if (stringSize >= 2 && buffer.Span[1..] is [> 0, 0, > 0, 0, ..])
+            {
+                Span<char> charBuffer = MemoryMarshal.Cast<byte, char>(buffer.Span[1..]);
+                int length = charBuffer[..(int)stringSize].IndexOf('\0');
+                value = length == -1 ? charBuffer[..(int)stringSize].ToString() : buffer.Span[1..][..(int)stringSize][..length].ToString();
+            }
+            else
+            {
+                int length = buffer.Span[1..][..(int)stringSize].IndexOf((byte)0);
+
+                unsafe
                 {
-                    value = new string((sbyte*)pBuffer, 0, length == -1 ? (int)stringSize : length);
+                    fixed (byte* pBuffer = buffer.Span[1..])
+                    {
+                        value = new string((sbyte*)pBuffer, 0, length == -1 ? (int)stringSize : length);
+                    }
                 }
             }
         }
 
-        if (rented is not null)
-            ArrayPool<byte>.Shared.Return(rented);
         return true;
     }
 }

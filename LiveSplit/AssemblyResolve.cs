@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Helper.LiveSplit;
+namespace EmuHelp.LiveSplit;
 
 public static class LiveSplitAssembly
 {

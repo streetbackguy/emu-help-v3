@@ -1,8 +1,8 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.GBA.Emulators;
+namespace EmuHelp.Systems.GBA.Emulators;
 
 internal class NoCashGBA : GBAEmulator
 {

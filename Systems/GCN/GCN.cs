@@ -1,10 +1,10 @@
-﻿using Helper.HelperBase;
-using Helper.GCN;
-using Helper.GCN.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Systems.GCN;
+using EmuHelp.Systems.GCN.Emulators;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 
 public class GameCube : GCN { }
@@ -37,8 +37,8 @@ public class GCN : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "Dolphin",
-        "retroarch",
+        "Dolphin.exe",
+        "retroarch.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -69,8 +69,8 @@ public class GCN : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "Dolphin" => new Dolphin(),
-            "retroarch" => new Retroarch(),
+            "Dolphin.exe" => new Dolphin(),
+            "retroarch.exe" => new Retroarch(),
             _ => null,
         };
     }

@@ -3,14 +3,14 @@
 // See: https://github.com/just-ero/asl-help
 
 #if LIVESPLIT
-using Helper.Logging;
+using EmuHelp.Logging;
 using LiveSplit.ASL;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace Helper.LiveSplit;
+namespace EmuHelp.LiveSplit;
 
 /// <summary>
 /// Represents a collection of actions that can be performed in an autosplitter.

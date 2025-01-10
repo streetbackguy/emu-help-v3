@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Systems.PS1.Emulators;
+namespace EmuHelp.Systems.PS1.Emulators;
 
 internal class Retroarch : PS1Emulator
 {

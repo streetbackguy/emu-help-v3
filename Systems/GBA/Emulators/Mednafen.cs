@@ -1,8 +1,8 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.GBA.Emulators;
+namespace EmuHelp.Systems.GBA.Emulators;
 
 internal class Mednafen : GBAEmulator
 {
@@ -26,6 +26,9 @@ internal class Mednafen : GBAEmulator
             : process.Scan(new MemoryScanPattern(1, "A1 ?? ?? ?? ?? 81 ?? FF FF 03 00") { OnFound = addr => process.ReadPointer(addr) }, mainModule);
         if (ewram_pointer == IntPtr.Zero)
             return false;
+        if (!process.ReadPointer(ewram_pointer, out IntPtr ewram))
+            return false;
+
 
         iwram_pointer = is64bit
             ? process.Scan(new MemoryScanPattern(3, "48 8B 05 ?? ?? ?? ?? 81 E1 FF 7F 00 00")
@@ -33,9 +36,11 @@ internal class Mednafen : GBAEmulator
             : process.Scan(new MemoryScanPattern(1, "A1 ?? ?? ?? ?? 81 ?? FF 7F 00 00") { OnFound = addr => process.ReadPointer(addr) });
         if (iwram_pointer == IntPtr.Zero)
             return false;
+        if (!process.ReadPointer(iwram_pointer, out IntPtr iwram))
+            return false;
 
-        EWRAM = process.ReadPointer(ewram_pointer);
-        IWRAM = process.ReadPointer(iwram_pointer);
+        EWRAM = ewram;
+        IWRAM = iwram;
 
         Log.Info("  => Hooked to emulator: Mednafen");
         Log.Info($"  => EWRAM address found at 0x{EWRAM.ToString("X")}");

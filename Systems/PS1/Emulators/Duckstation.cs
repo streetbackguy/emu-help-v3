@@ -1,8 +1,8 @@
-﻿using Helper.Logging;
+﻿using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 using System;
 
-namespace Helper.Systems.PS1.Emulators;
+namespace EmuHelp.Systems.PS1.Emulators;
 
 internal class Duckstation : PS1Emulator
 {

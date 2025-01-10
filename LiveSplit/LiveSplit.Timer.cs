@@ -11,7 +11,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 
-namespace Helper.LiveSplit;
+namespace EmuHelp.LiveSplit;
 
 /// <summary>
 /// Provides access to the current state of a LiveSplit timer and its associated properties.

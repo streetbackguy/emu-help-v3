@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.GBA.Emulators;
+namespace EmuHelp.Systems.GBA.Emulators;
 
 internal class Retroarch : GBAEmulator
 {
     private IntPtr core_base_address;
+    
     private readonly string[] supportedCores =
     [
         "vbam_libretro.dll",
@@ -18,35 +19,33 @@ internal class Retroarch : GBAEmulator
     ];
 
     internal Retroarch()
-    : base()
+        : base()
     {
         Log.Info("  => Attached to emulator: Retroarch");
     }
 
-    public override bool FindRAM(ProcessMemory _process)
+    public override bool FindRAM(ProcessMemory process)
     {
-        ProcessModule currentCore = _process.Modules.FirstOrDefault(m => supportedCores.Contains(m.ModuleName));
+        ProcessModule core = process.Modules.FirstOrDefault(m => supportedCores.Contains(m.ModuleName));
 
-        if (currentCore == default)
+        if (core == default)
             return false;
 
-        core_base_address = currentCore.BaseAddress;
-
-        IntPtr ewram, iwram;
-
-        bool success = currentCore.ModuleName switch
+        core_base_address = core.BaseAddress;
+        IntPtr iwram, ewram;
+        bool success = core.ModuleName switch
         {
-            "vbam_libretro.dll" or "mednafen_gba_libretro.dll" or "vba_next_libretro.dll" => vba(_process, currentCore, out ewram, out iwram),
-            "mgba_libretro.dll" => mGBA(_process, out ewram, out iwram),
-            "gpsp_libretro.dll" => gpSP(_process, currentCore, out ewram, out iwram),
+            "vbam_libretro.dll" or "mednafen_gba_libretro.dll" or "vba_next_libretro.dll" => vba(process, core, out ewram, out iwram),
+            "mgba_libretro.dll" => mGBA(process, out ewram, out iwram),
+            "gpsp_libretro.dll" => gpSP(process, core, out ewram, out iwram),
             _ => throw new NotImplementedException(),
         };
 
-        if (ewram == IntPtr.Zero || iwram == IntPtr.Zero)
-        {
-            EWRAM = ewram;
-            IWRAM = iwram;
-        }
+        if (!success)
+            return false;
+
+        EWRAM = ewram;
+        IWRAM = iwram;
 
         Log.Info($"  => EWRAM address found at 0x{EWRAM.ToString("X")}");
         Log.Info($"  => IWRAM address found at 0x{IWRAM.ToString("X")}");
@@ -84,9 +83,7 @@ internal class Retroarch : GBAEmulator
             iwram_pointer = ptr;
         }
 
-        ewram = process.ReadPointer(ewram_pointer);
-        iwram = process.ReadPointer(iwram_pointer);
-        return true;
+        return process.ReadPointer(ewram_pointer, out ewram) && process.ReadPointer(iwram_pointer, out iwram);
     }
 
     private bool mGBA(ProcessMemory process, out IntPtr ewram, out IntPtr iwram)

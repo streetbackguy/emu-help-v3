@@ -1,9 +1,9 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Genesis.Emulators;
+namespace EmuHelp.Systems.Genesis.Emulators;
 
 internal class SegaClassics : GenesisEmulator
 {
@@ -53,7 +53,6 @@ internal class SegaClassics : GenesisEmulator
     {
         if (!process.Read(addr_base, out IntPtr ptr))
             return false;
-
         RamBase = ptr;
         return true;
     }

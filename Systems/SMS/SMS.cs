@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
-using Helper.Logging;
-using Helper.SMS;
-using Helper.SMS.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Logging;
+using EmuHelp.Systems.SMS;
+using EmuHelp.Systems.SMS.Emulators;
 using System;
 
 public class SegaMasterSystem : SMS { }
@@ -34,10 +34,10 @@ public class SMS : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "retroarch",
-        "blastem",
-        "Fusion",
-        "mednafen",
+        "retroarch.exe",
+        "blastem.exe",
+        "Fusion.exe",
+        "mednafen.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -72,10 +72,10 @@ public class SMS : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "retroarch" => new Retroarch(),
-            "blastem" => new BlastEm(),
-            "Fusion" => new Fusion(),
-            "mednafen" => new Mednafen(),
+            "retroarch.exe" => new Retroarch(),
+            "blastem.exe" => new BlastEm(),
+            "Fusion.exe" => new Fusion(),
+            "mednafen.exe" => new Mednafen(),
             _ => null,
         };
     }

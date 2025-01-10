@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
-using Helper.Logging;
-using Helper.Wii;
-using Helper.Wii.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Logging;
+using EmuHelp.Systems.Wii;
+using EmuHelp.Systems.Wii.Emulators;
 using JHelper.Common.MemoryUtils;
 using System;
 using System.Buffers;
@@ -37,8 +37,8 @@ public class WII : HelperBase
 
     internal override string[] ProcessNames { get; } =
     [
-        "Dolphin",
-        "retroarch",
+        "Dolphin.exe",
+        "retroarch.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -73,8 +73,8 @@ public class WII : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "Dolphin" => new Dolphin(),
-            "retroarch" => new Retroarch(),
+            "Dolphin.exe" => new Dolphin(),
+            "retroarch.exe" => new Retroarch(),
             _ => null,
         };
     }

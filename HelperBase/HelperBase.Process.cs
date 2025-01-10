@@ -5,15 +5,15 @@
 // but is returned immediately if the last execution time is less than 1.5 seconds before.
 
 using JHelper.Common.ProcessInterop;
-using Helper.Logging;
+using EmuHelp.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
 #if LIVESPLIT
-using Helper.LiveSplit;
+using EmuHelp.LiveSplit;
 #endif
 
-namespace Helper.HelperBase;
+namespace EmuHelp.HelperBase;
 
 public abstract partial class HelperBase
 {

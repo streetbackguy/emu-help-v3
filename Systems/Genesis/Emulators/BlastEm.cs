@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Genesis.Emulators;
+namespace EmuHelp.Systems.Genesis.Emulators;
 
 internal class BlastEm : GenesisEmulator
 {
@@ -17,9 +17,9 @@ internal class BlastEm : GenesisEmulator
 
     public override bool FindRAM(ProcessMemory _process)
     {
-        var target = new MemoryScanPattern(11, "72 0E 81 E1 FF FF 00 00 66 8B 89 ?? ?? ?? ?? C3") { OnFound = _process.ReadPointer };
+        MemoryScanPattern target = new MemoryScanPattern(11, "72 0E 81 E1 FF FF 00 00 66 8B 89 ?? ?? ?? ?? C3") { OnFound = _process.ReadPointer };
 
-        IntPtr ptr = _process.MemoryPages.Where(p => p.RegionSize == 0x10100 && p.Protect == MemoryProtection.PAGE_READWRITE)
+        IntPtr ptr = _process.MemoryPages.Where(p => p.RegionSize == 0x101000 && (p.Protect & MemoryProtection.PAGE_EXECUTE_READWRITE) != 0)
             .Select(page => _process.Scan(target, page.BaseAddress, (int)page.RegionSize))
             .FirstOrDefault(addr => addr != IntPtr.Zero);
 
@@ -27,13 +27,10 @@ internal class BlastEm : GenesisEmulator
             return false;
 
         RamBase = ptr;
-            
+
         Log.Info($"  => RAM address found at 0x{RamBase.ToString("X")}");
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory _)
-    {
-        return true;
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

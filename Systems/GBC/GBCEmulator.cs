@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using System;
 
-namespace Helper.GBC;
+namespace EmuHelp.Systems.GBC;
 
 public abstract class GBCEmulator : Emulator
 {

@@ -1,8 +1,8 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using JHelper.Common.MemoryUtils;
 using System;
 
-namespace Helper.GCN;
+namespace EmuHelp.Systems.GCN;
 
 public abstract class GCNEmulator : Emulator
 {

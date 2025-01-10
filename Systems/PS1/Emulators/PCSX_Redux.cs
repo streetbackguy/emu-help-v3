@@ -1,12 +1,13 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Systems.PS1.Emulators;
+namespace EmuHelp.Systems.PS1.Emulators;
 
 internal class PCSXRedux : PS1Emulator
 {
-    private IntPtr addr_base, addr;
+    private IntPtr baseAddress;
+    private int[]? offsets;
 
     internal PCSXRedux()
         : base()
@@ -16,56 +17,33 @@ internal class PCSXRedux : PS1Emulator
 
     public override bool FindRAM(ProcessMemory _process)
     {
-        if (_process.Is64Bit)
-        {
-            addr_base = _process.Scan(new ScanPattern(2, "48 B9 ?? ?? ?? ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? C7 85 ?? ?? ?? ?? 00 00 00 00"));
-            if (addr_base == IntPtr.Zero)
-                return false;
+        if (!_process.Is64Bit)
+            return false;
 
-            if (!_process.Read(addr_base, out IntPtr ptrl))
-                return false;
-            addr = ptrl;
+        baseAddress = _process.Scan(new MemoryScanPattern(3, "48 8B 0D ?? ?? ?? ?? ?? ?? ?? FF FF FF 00") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
+        // baseAddress = _process.Scan(new MemoryScanPattern(3, "48 8B 05 ?? ?? ?? ?? 45 85 C0") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
+        if (baseAddress == IntPtr.Zero)
+            return false;
 
-            IntPtr ptr = _process.Scan(new ScanPattern(8, "89 D1 C1 E9 10 48 8B"));
-            if (ptr == IntPtr.Zero)
-                return false;
+        var pAddr = _process.Scan(new MemoryScanPattern(0, "4C 8B 99 ?? ?? ?? ?? 4D 8B 7B"));
+        if (pAddr == IntPtr.Zero)
+            return false;
 
-            if (!_process.Read<byte>(ptr, out byte offset))
-                return false;
+        offsets = [ _process.Read<int>(pAddr + 3), _process.Read<byte>(pAddr + 10), 0 ];
+        RamBase = _process.DerefOffsets(baseAddress, offsets);
 
-            if (!_process.Read(addr + offset, out ptrl))
-                return false;
-            ptr = ptrl;
+        if (RamBase != IntPtr.Zero)
+            Log.Info($"  => RAM address found at 0x{RamBase.ToString("X")}");
 
-            if (!_process.Read(ptr, out ptrl))
-                return false;
-
-            RamBase = ptrl;
-        }
-        else
-        {
-            ScanPattern target = new(2, "8B 3D 20 ?? ?? ?? 0F B7 D3 8B 04 95 ?? ?? ?? ?? 21 05");
-
-            foreach (MemoryPage page in _process.MemoryPages)
-            {
-                addr_base = _process.Scan(target, page.BaseAddress, (int)page.RegionSize);
-
-                if (addr_base != IntPtr.Zero)
-                    break;
-            }
-            if (addr_base == IntPtr.Zero)
-                return false;
-
-            if (!_process.Read<int>(addr_base, out int ptrl))
-                return false;
-
-            addr = (IntPtr)ptrl;
-            RamBase = addr;
-        }
-
-        Log.Info($"  => RAM address found at 0x{RamBase.ToString("X")}");
         return true;
     }
 
-    public override bool KeepAlive(ProcessMemory process) => process.Read(addr_base, out IntPtr ptr) && ptr == addr;
+    public override bool KeepAlive(ProcessMemory process)
+    {
+        if (offsets is null)
+            return false;
+
+        RamBase = process.DerefOffsets(baseAddress, offsets);
+        return true;
+    }
 }

@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using System;
 
-namespace Helper.SMS;
+namespace EmuHelp.Systems.SMS;
 
 public abstract class SMSEmulator : Emulator
 {

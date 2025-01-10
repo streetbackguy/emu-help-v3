@@ -1,8 +1,8 @@
-﻿using Helper.HelperBase;
-using Helper.GBA;
-using Helper.GBA.Emulators;
+﻿using EmuHelp.HelperBase;
+using EmuHelp.Systems.GBA;
+using EmuHelp.Systems.GBA.Emulators;
 using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 
 public class Gameboyadvance : GBA { }
 
@@ -38,15 +38,14 @@ public class GBA : HelperBase
 
     internal override string[] ProcessNames { get; } =
     {
-        "visualboyadvance-m",
-        "VisualBoyAdvance",
-        "mGBA",
-        "NO$GBA",
-        "retroarch",
-        "EmuHawk",
-        "mednafen",
-        "GSR",
-        "GSE",
+        "visualboyadvance-m.exe",
+        "VisualBoyAdvance.exe",
+        "mGBA.exe",
+        "NO$GBA.EXE",
+        "retroarch.exe",
+        "mednafen.exe",
+        "GSR.exe",
+        "GSE.exe",
     };
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -79,13 +78,12 @@ public class GBA : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "visualboyadvance-m" or "VisualBoyAdvance" => new VisualBoyAdvance(),
-            "mGBA" => new mGBA(),
-            "NO$GBA" => new NoCashGBA(),
-            "retroarch" => new Retroarch(),
-            "EmuHawk" => new EmuHawk(),
-            "mednafen" => new Mednafen(),
-            "GSR" or "GSE" => new GSE(),
+            "visualboyadvance-m.exe" or "VisualBoyAdvance.exe" => new VisualBoyAdvance(),
+            "mGBA.exe" => new mGBA(),
+            "NO$GBA.EXE" => new NoCashGBA(),
+            "retroarch.exe" => new Retroarch(),
+            "mednafen.exe" => new Mednafen(),
+            "GSR.exe" or "GSE.exe" => new GSE(),
             _ => null,
         };
     }

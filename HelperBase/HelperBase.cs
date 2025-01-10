@@ -1,10 +1,11 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
+using System.Diagnostics;
 #if LIVESPLIT
-using Helper.LiveSplit;
+using EmuHelp.LiveSplit;
 #endif
 
-namespace Helper.HelperBase;
+namespace EmuHelp.HelperBase;
 
 /// <summary>
 /// Base class for helpers that interact with emulators. This abstract class
@@ -38,24 +39,39 @@ public abstract partial class HelperBase : IDisposable
 #endif
     {
 #if LIVESPLIT
-        // Subscribe to the AssemblyResolve event to handle dynamic assembly loading
+        using (Process thisProcess = Process.GetCurrentProcess())
+        {
+            if (!thisProcess.ProcessName.Equals("livesplit", StringComparison.InvariantCultureIgnoreCase))
+                throw new InvalidProgramException("This helper can be initialized only on LiveSplit.");
+        }
+
+        // Ensure the helper is instantiated in the 'startup {}' action
+        if (Actions.CurrentAction != ASLMethodNames.Startup)
+            throw new InvalidOperationException("The helper may only be instantiated in the 'startup {}' action.");
+
+        // Log welcome messages
+        Log.Welcome();
+
+        // Subscribe to the AssemblyResolve event to handle assembly loading
         LiveSplitAssembly.AssemblyResolveSubscribe();
         try
         {
-            isASLCodeGenerating = generateCode;
+            // Manually invoke the static constructor for the static Autosplitter class.
+            // This allows us to access the script and LiveSplit data even without
+            // code generation.
+            typeof(Autosplitter).TypeInitializer.Invoke(null, null);
+        }
+        finally
+        {
+            // Unsubscribe from the AssemblyResolve event
+            LiveSplitAssembly.AssemblyResolveUnsubscribe();
+        }
 
+        isASLCodeGenerating = generateCode;
             if (isASLCodeGenerating)
             {
-                // Ensure the helper is instantiated in the 'startup {}' action
-                if (Actions.CurrentAction != ASLMethodNames.Startup)
-                    throw new InvalidOperationException("The helper may only be instantiated in the 'startup {}' action.");
-
-                // Log welcome messages
-                Log.Welcome();
-                Log.Info();
                 Log.Info("Loading emu-help...");
                 Log.Info("  => Generating code...");
-
                 string helperName = "Helper";
                 Autosplitter.Vars[helperName] = this;
                 Log.Info($"    => Set helper to vars.{helperName}.");
@@ -67,17 +83,9 @@ public abstract partial class HelperBase : IDisposable
             {
                 // Log messages when code generation is disabled
 #endif
-                Log.Welcome();
-                Log.Info();
                 Log.Info("Loading helper...");
 #if LIVESPLIT
             }
-        }
-        finally
-        {
-            // Unsubscribe from the AssemblyResolve event
-            LiveSplitAssembly.AssemblyResolveUnsubscribe();
-        }
 #endif
     }
 
@@ -131,15 +139,6 @@ public abstract partial class HelperBase : IDisposable
             }
 
             _tickCounter.Tick();
-
-#if LIVESPLIT
-            if (isASLCodeGenerating)
-            {
-                _watchers.UpdateAll();
-                foreach (var entry in _watchers)
-                    Autosplitter.Current[entry.Key] = ((dynamic)entry.Value).Current;
-            }
-#endif
 
             // Return true indicating a successful update
             return true;

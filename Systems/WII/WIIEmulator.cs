@@ -1,8 +1,8 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using JHelper.Common.MemoryUtils;
 using System;
 
-namespace Helper.Wii;
+namespace EmuHelp.Systems.Wii;
 
 public abstract class WIIEmulator : Emulator
 {

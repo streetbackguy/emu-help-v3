@@ -1,9 +1,9 @@
 ﻿using System;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Genesis.Emulators;
+namespace EmuHelp.Systems.Genesis.Emulators;
 
 internal class Gens : GenesisEmulator
 {

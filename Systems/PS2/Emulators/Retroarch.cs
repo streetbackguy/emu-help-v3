@@ -1,9 +1,9 @@
-﻿using Helper.Logging;
+﻿using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 using System;
 using System.Linq;
 
-namespace Helper.PS2.Emulators;
+namespace EmuHelp.Systems.PS2.Emulators;
 
 internal class Retroarch : PS2Emulator
 {

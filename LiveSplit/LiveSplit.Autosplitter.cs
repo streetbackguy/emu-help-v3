@@ -13,7 +13,7 @@ using Irony.Parsing;
 using LiveSplit.ASL;
 using LiveSplit.UI.Components;
 
-namespace Helper.LiveSplit;
+namespace EmuHelp.LiveSplit;
 
 /// <summary>
 /// Static class that handles the integration of the autosplitter with LiveSplit.

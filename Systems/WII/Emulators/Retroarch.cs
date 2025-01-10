@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.Wii.Emulators;
+namespace EmuHelp.Systems.Wii.Emulators;
 
 internal class Retroarch : WIIEmulator
 {

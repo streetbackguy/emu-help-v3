@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Helper.Logging;
+using EmuHelp.Logging;
 using JHelper.Common.ProcessInterop;
 
-namespace Helper.GBC.Emulators;
+namespace EmuHelp.Systems.GBC.Emulators;
 
 internal class GSR : GBCEmulator
 {

@@ -1,7 +1,7 @@
-﻿using Helper.HelperBase;
+﻿using EmuHelp.HelperBase;
 using System;
 
-namespace Helper.GBA;
+namespace EmuHelp.Systems.GBA;
 
 public abstract class GBAEmulator : Emulator
 {
