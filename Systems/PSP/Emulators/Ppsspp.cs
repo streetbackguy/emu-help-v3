@@ -19,7 +19,7 @@ internal class Ppsspp : PSPEmulator
     {
         if (_process.Is64Bit)
         {
-            addr_base = _process.Scan(new MemoryScanPattern(3, "48 8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
+            addr_base = _process.Scan(new MemoryScanPattern(22, "41 B9 ?? 05 00 00 48 89 44 24 20 8D 4A FC E8 ?? ?? ?? FF 48 8B 0D ?? ?? ?? 00 48 03 CB") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
             if (addr_base == IntPtr.Zero)
                 return false;
 
