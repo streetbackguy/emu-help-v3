@@ -10,8 +10,8 @@ public class PlayStationPortable : PSP { }
 
 public class PSP : HelperBase
 {
-    private const uint MINSIZE = 0x00100000;
-    private const uint MAXSIZE = 0x02000000;
+    private const uint MINSIZE = 0x08800000;
+    private const uint MAXSIZE = 0x88000000;
 
     private PSPEmulator? Pspemulator
     {
