@@ -1,64 +1,57 @@
 ﻿using EmuHelp.HelperBase;
-using EmuHelp.Systems.GCN;
-using EmuHelp.Systems.GCN.Emulators;
+using EmuHelp.Logging;
+using EmuHelp.Systems.Xbox360;
+using EmuHelp.Systems.Xbox360.Emulators;
+using JHelper.Common.MemoryUtils;
 using System;
 using System.Runtime.InteropServices;
-using EmuHelp.Logging;
-using JHelper.Common.MemoryUtils;
 
-public class GameCube : GCN { }
+public class X360 : Xbox360 { }
 
-public class Gamecube : GCN { }
-
-public class GCN : HelperBase
+public class Xbox360 : HelperBase
 {
-    private const uint MINSIZE = 0x80000000;
-    private const uint MAXSIZE = 0x81800000;
+    // Xbox 360s Memory Regions
+    // 0x30000000 - Heap Memory Region
+    // 0x40000000 - Allocated Data Memory Region
+    // 0x70000000 - the Stack Memory Region
+    // 0x82000000 - Basefiles Memory Region
+    // 0xC0000000 – 0xDFFFFFFF - Full 512mb Ram Memory Region
 
-    private GCNEmulator? Gcnemulator
+    private Xbox360Emulator? Xbox360emulator
     {
-        get => (GCNEmulator?)emulatorClass;
+        get => (Xbox360Emulator?)emulatorClass;
         set => emulatorClass = value;
     }
 
-    public GCN()
+    public Xbox360()
 #if LIVESPLIT
         : this(true) { }
 
-    public GCN(bool generateCode)
+    public Xbox360(bool generateCode)
         : base(generateCode)
 #else
         : base()
 #endif
     {
-        Log.Info("  => GCN Helper started");
+        Log.Info("  => Xbox360 Helper started");
     }
 
     internal override string[] ProcessNames { get; } =
     [
-        "Dolphin.exe",
-        "retroarch.exe",
+        "xenia.exe",
+        "xenia_canary.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
     {
-        realAddress = default;
-
-        if (Gcnemulator is null)
-            return false;
-
-        IntPtr baseRam = Gcnemulator.MEM1;
-
-        if (baseRam == IntPtr.Zero)
-            return false;
-
-
-        if (address >= MINSIZE && address < MAXSIZE)
+        if (Xbox360emulator is null)
         {
-            realAddress = (IntPtr)((ulong)baseRam + address - MINSIZE);
-            return true;
+            realAddress = default;
+            return false;
         }
-        return false;
+
+        realAddress = (IntPtr)((ulong)Xbox360emulator.RamBase + address);
+        return true;
     }
 
     internal override Emulator? AttachEmuClass()
@@ -68,8 +61,7 @@ public class GCN : HelperBase
 
         return emulatorProcess.ProcessName switch
         {
-            "Dolphin.exe" => new Dolphin(),
-            "retroarch.exe" => new Retroarch(),
+            "xenia.exe" or "xenia_canary.exe" => new Xenia(),
             _ => null,
         };
     }
@@ -78,7 +70,7 @@ public class GCN : HelperBase
     {
         value = default;
 
-        if (emulatorProcess is null || Gcnemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
+        if (emulatorProcess is null || Xbox360emulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
             return false;
 
         int t_size;
@@ -89,27 +81,26 @@ public class GCN : HelperBase
 
         using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
         {
-            Span<byte> span = buffer.Span;
-
-            if (!emulatorProcess.ReadArray(realAddress, span))
+            if (!emulatorProcess.ReadArray(realAddress, buffer.Span))
                 return false;
 
-            if (Gcnemulator.Endianness == Endianness.Big)
-                span.Reverse();
+            if (Xbox360emulator.Endianness == Endianness.Big)
+                buffer.Span.Reverse();
 
             unsafe
             {
-                fixed (byte* ptr = span)
+                fixed (byte* ptr = buffer.Span)
                     value = *(T*)ptr;
             }
         }
+
         return true;
     }
 
     protected override bool ResolvePath(out IntPtr finalAddress, ulong baseAddress, params int[] offsets)
     {
         // Check if the emulator process is valid and retrieve the real address for the base address
-        if (emulatorProcess is null || Gcnemulator is null || !TryGetRealAddress(baseAddress, out finalAddress))
+        if (emulatorProcess is null || Xbox360emulator is null || !TryGetRealAddress(baseAddress, out finalAddress))
         {
             finalAddress = default;
             return false;
@@ -118,7 +109,7 @@ public class GCN : HelperBase
         foreach (int offset in offsets)
         {
             if (!emulatorProcess.Read(finalAddress, out uint tempAddress)
-                || !TryGetRealAddress((ulong)(tempAddress.FromEndian(Gcnemulator.Endianness) + offset), out finalAddress))
+                || !TryGetRealAddress((ulong)(tempAddress.FromEndian(Xbox360emulator.Endianness) + offset), out finalAddress))
                 return false;
         }
 
@@ -127,7 +118,7 @@ public class GCN : HelperBase
 
     public override bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
     {
-        if (emulatorProcess is null || Gcnemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
+        if (emulatorProcess is null || Xbox360emulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
         {
             value = new T[size];
             return false;
@@ -136,18 +127,18 @@ public class GCN : HelperBase
         int t_size;
         unsafe
         {
-            t_size = sizeof(T) * (int)size;
+            t_size = (int)size * sizeof(T);
         }
-
+        
         using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
         {
             if (!emulatorProcess.ReadArray(realAddress, buffer.Span))
             {
-                value = new T[t_size];
+                value = new T[size];
                 return false;
             }
 
-            if (Gcnemulator.Endianness == Endianness.Big)
+            if (Xbox360emulator.Endianness == Endianness.Big)
             {
                 int s;
                 unsafe
