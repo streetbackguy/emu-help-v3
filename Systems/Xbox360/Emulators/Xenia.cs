@@ -23,7 +23,7 @@ internal class Xenia : Xbox360Emulator
 
         // To identify the start of the emulated RAM, we can look for
         // the PE header of the loaded .xex in memory.
-        for (int i = 32; i < 46; i++)
+        for (int i = 32; i < 47; i++)
         {
             IntPtr tempAddr = (nint)1 << i;
             IntPtr baseModule = (IntPtr)((nint)tempAddr + 0x82000000);
