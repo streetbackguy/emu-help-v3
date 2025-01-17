@@ -2,7 +2,6 @@
 using EmuHelp.Systems.GCN;
 using EmuHelp.Systems.GCN.Emulators;
 using System;
-using System.Runtime.InteropServices;
 using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 
@@ -76,34 +75,15 @@ public class GCN : HelperBase
 
     public override bool TryRead<T>(out T value, ulong address, params int[] offsets)
     {
-        value = default;
-
         if (emulatorProcess is null || Gcnemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
+        {
+            value = default;
             return false;
-
-        int t_size;
-        unsafe
-        {
-            t_size = sizeof(T);
         }
 
-        using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
-        {
-            Span<byte> span = buffer.Span;
-
-            if (!emulatorProcess.ReadArray(realAddress, span))
-                return false;
-
-            if (Gcnemulator.Endianness == Endianness.Big)
-                span.Reverse();
-
-            unsafe
-            {
-                fixed (byte* ptr = span)
-                    value = *(T*)ptr;
-            }
-        }
-        return true;
+        return Gcnemulator.Endianness == Endianness.Big
+            ? emulatorProcess.ReadBigEndian(realAddress, out value)
+            : emulatorProcess.Read(realAddress, out value);
     }
 
     protected override bool ResolvePath(out IntPtr finalAddress, ulong baseAddress, params int[] offsets)
@@ -117,15 +97,19 @@ public class GCN : HelperBase
 
         foreach (int offset in offsets)
         {
-            if (!emulatorProcess.Read(finalAddress, out uint tempAddress)
-                || !TryGetRealAddress((ulong)(tempAddress.FromEndian(Gcnemulator.Endianness) + offset), out finalAddress))
+            uint tempAddress;
+
+            if (!(Gcnemulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadBigEndian(finalAddress, out tempAddress)
+                : emulatorProcess.Read(finalAddress, out tempAddress))
+                || !TryGetRealAddress((ulong)(tempAddress + offset), out finalAddress))
                 return false;
         }
 
         return true;
     }
 
-    public override bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
+    public override unsafe bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
     {
         if (emulatorProcess is null || Gcnemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
         {
@@ -133,34 +117,17 @@ public class GCN : HelperBase
             return false;
         }
 
-        int t_size;
-        unsafe
+        using (ArrayRental<T> buffer = (int)size * sizeof(T) <= 1024 ? new(stackalloc T[(int)size]) : new((int)size))
         {
-            t_size = sizeof(T) * (int)size;
-        }
-
-        using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
-        {
-            if (!emulatorProcess.ReadArray(realAddress, buffer.Span))
+            if (!(Gcnemulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadArrayBigEndian(realAddress, buffer.Span)
+                : emulatorProcess.ReadArray(realAddress, buffer.Span)))
             {
-                value = new T[t_size];
+                value = new T[(int)size];
                 return false;
             }
 
-            if (Gcnemulator.Endianness == Endianness.Big)
-            {
-                int s;
-                unsafe
-                {
-                    s = sizeof(T);
-                }
-
-                for (int i = 0; i < size; i++)
-                    buffer.Span[(s * i)..(s * (i + 1))].Reverse();
-            }
-
-            Span<T> newBuf = MemoryMarshal.Cast<byte, T>(buffer.Span);
-            value = newBuf[..(int)size].ToArray();
+            value = buffer.Span.ToArray();
         }
 
         return true;

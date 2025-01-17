@@ -1,5 +1,6 @@
 ﻿using EmuHelp.HelperBase;
 using EmuHelp.Logging;
+using EmuHelp.Systems.Wii;
 using EmuHelp.Systems.Xbox360;
 using EmuHelp.Systems.Xbox360.Emulators;
 using JHelper.Common.MemoryUtils;
@@ -68,33 +69,15 @@ public class Xbox360 : HelperBase
 
     public override bool TryRead<T>(out T value, ulong address, params int[] offsets)
     {
-        value = default;
-
         if (emulatorProcess is null || Xbox360emulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
+        {
+            value = default;
             return false;
-
-        int t_size;
-        unsafe
-        {
-            t_size = sizeof(T);
         }
 
-        using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
-        {
-            if (!emulatorProcess.ReadArray(realAddress, buffer.Span))
-                return false;
-
-            if (Xbox360emulator.Endianness == Endianness.Big)
-                buffer.Span.Reverse();
-
-            unsafe
-            {
-                fixed (byte* ptr = buffer.Span)
-                    value = *(T*)ptr;
-            }
-        }
-
-        return true;
+        return Xbox360emulator.Endianness == Endianness.Big
+            ? emulatorProcess.ReadBigEndian(realAddress, out value)
+            : emulatorProcess.Read(realAddress, out value);
     }
 
     protected override bool ResolvePath(out IntPtr finalAddress, ulong baseAddress, params int[] offsets)
@@ -108,15 +91,19 @@ public class Xbox360 : HelperBase
 
         foreach (int offset in offsets)
         {
-            if (!emulatorProcess.Read(finalAddress, out uint tempAddress)
-                || !TryGetRealAddress((ulong)(tempAddress.FromEndian(Xbox360emulator.Endianness) + offset), out finalAddress))
+            uint tempAddress;
+
+            if (!(Xbox360emulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadBigEndian(finalAddress, out tempAddress)
+                : emulatorProcess.Read(finalAddress, out tempAddress))
+                || !TryGetRealAddress((ulong)(tempAddress + offset), out finalAddress))
                 return false;
         }
 
         return true;
     }
 
-    public override bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
+    public override unsafe bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
     {
         if (emulatorProcess is null || Xbox360emulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
         {
@@ -124,34 +111,17 @@ public class Xbox360 : HelperBase
             return false;
         }
 
-        int t_size;
-        unsafe
+        using (ArrayRental<T> buffer = (int)size * sizeof(T) <= 1024 ? new(stackalloc T[(int)size]) : new((int)size))
         {
-            t_size = (int)size * sizeof(T);
-        }
-        
-        using (ArrayRental<byte> buffer = t_size <= 1024 ? new(stackalloc byte[t_size]) : new(t_size))
-        {
-            if (!emulatorProcess.ReadArray(realAddress, buffer.Span))
+            if (!(Xbox360emulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadArrayBigEndian(realAddress, buffer.Span)
+                : emulatorProcess.ReadArray(realAddress, buffer.Span)))
             {
-                value = new T[size];
+                value = new T[(int)size];
                 return false;
             }
 
-            if (Xbox360emulator.Endianness == Endianness.Big)
-            {
-                int s;
-                unsafe
-                {
-                    s = sizeof(T);
-                }
-
-                for (int i = 0; i < size; i++)
-                    buffer.Span[(s * i)..(s * (i + 1))].Reverse();
-            }
-
-            Span<T> newBuf = MemoryMarshal.Cast<byte, T>(buffer.Span);
-            value = newBuf[..(int)size].ToArray();
+            value = buffer.Span.ToArray();
         }
 
         return true;
