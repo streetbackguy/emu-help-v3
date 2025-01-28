@@ -37,10 +37,10 @@ jobs:
     - name: Commit and push the DLL to the repo
       if: github.event_name == 'push'
       run: |
-        if exist .\lib\Livesplit\emu-help-v3 (
+        if (Test-Path .\lib\Livesplit\emu-help-v3) (
           del .\lib\Livesplit\emu-help-v3
         )
-        if exist .\lib\Standalone\emu-help-v3.dll (
+        if (Test-Path .\lib\Standalone\emu-help-v3.dll) (
           del .\lib\Standalone\emu-help-v3.dll
         )
 
