@@ -16,6 +16,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 0
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -27,7 +30,7 @@ jobs:
 
     - name: Build solution targeting netstandard2.0
       run: |
-        dotnet build --framework netstandard2.0 --configuration Release --no-restore
+        dotnet build --framework netstandard2.0 --configuration Livesplit --no-restore
         dotnet build --framework netstandard2.0 --configuration Generic --no-restore
 
 
