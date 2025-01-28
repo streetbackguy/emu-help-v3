@@ -1,0 +1,52 @@
+name: Build and Test C# Library for netstandard2.0
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'lib/**'  # Ignore changes in the lib folder
+  
+jobs:
+  build:
+    name: Compilation and upload
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution targeting netstandard2.0
+      run: |
+        dotnet build --framework netstandard2.0 --configuration Release --no-restore
+        dotnet build --framework netstandard2.0 --configuration Generic --no-restore
+
+
+    - name: Commit and push the DLL to the repo
+      if: github.event_name == 'push'
+      run: |
+        if exist .\lib\Livesplit\emu-help-v3 (
+          del .\lib\Livesplit\emu-help-v3
+        )
+        if exist .\lib\Livesplit\emu-help-v3.dll (
+          del .\lib\Livesplit\emu-help-v3.dll
+        )
+
+        move .\lib\Livesplit\netstandard2.0\emu-help-v3 .\lib\Livesplit\emu-help-v3
+        move .\lib\Generic\netstandard2.0\emu-help-v3 .\lib\Standalone\emu-help-v3.dll
+
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git commit -m "Add compiled assemblies to repo"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
