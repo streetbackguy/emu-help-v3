@@ -37,8 +37,8 @@ jobs:
         if exist .\lib\Livesplit\emu-help-v3 (
           del .\lib\Livesplit\emu-help-v3
         )
-        if exist .\lib\Livesplit\emu-help-v3.dll (
-          del .\lib\Livesplit\emu-help-v3.dll
+        if exist .\lib\Standalone\emu-help-v3.dll (
+          del .\lib\Standalone\emu-help-v3.dll
         )
 
         move .\lib\Livesplit\netstandard2.0\emu-help-v3 .\lib\Livesplit\emu-help-v3

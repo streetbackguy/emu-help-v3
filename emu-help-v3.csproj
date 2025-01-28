@@ -32,27 +32,27 @@
 
   <ItemGroup>
     <Reference Include="Irony">
-      <HintPath>C:\Program Files (x86)\LiveSplit\Components\Irony.dll</HintPath>
+      <HintPath>.\ref\Irony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.Core">
-      <HintPath>C:\Program Files (x86)\LiveSplit\LiveSplit.Core.dll</HintPath>
+      <HintPath>.\ref\LiveSplit.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.ScriptableAutoSplit">
-      <HintPath>C:\Program Files (x86)\LiveSplit\Components\LiveSplit.ScriptableAutoSplit.dll</HintPath>
+      <HintPath>.\ref\LiveSplit.ScriptableAutoSplit.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="LiveSplit.View">
-      <HintPath>C:\Program Files (x86)\LiveSplit\LiveSplit.View.dll</HintPath>
+      <HintPath>.\ref\LiveSplit.View.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Buffers">
-      <HintPath>C:\Program Files (x86)\LiveSplit\System.Buffers.dll</HintPath>
+      <HintPath>.\ref\System.Buffers.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Memory">
-      <HintPath>C:\Program Files (x86)\LiveSplit\System.Memory.dll</HintPath>
+      <HintPath>.\ref\System.Memory.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
