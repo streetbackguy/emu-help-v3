@@ -6,7 +6,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>EmuHelp</RootNamespace>
     <Nullable>enable</Nullable>
-    <BaseOutputPath>lib\</BaseOutputPath>
+    <BaseOutputPath>bin\</BaseOutputPath>
     <Configurations>Livesplit;Generic</Configurations>
   </PropertyGroup>
 
@@ -56,13 +56,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rename &quot;$(TargetPath)&quot; &quot;emu-help-v3&quot;" />
-  </Target>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="del &quot;$(TargetDir)emu-help-v3&quot;" />
-  </Target>
 
 </Project>

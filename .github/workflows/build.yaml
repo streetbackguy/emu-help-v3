@@ -47,8 +47,8 @@ jobs:
           del .\lib\Standalone\emu-help-v3.dll
         }
 
-        move .\lib\Livesplit\netstandard2.0\emu-help-v3 .\lib\Livesplit\emu-help-v3
-        move .\lib\Generic\netstandard2.0\emu-help-v3 .\lib\Standalone\emu-help-v3.dll
+        move .\bin\Livesplit\netstandard2.0\emu-help-v3.dll .\lib\Livesplit\emu-help-v3
+        move .\bin\Generic\netstandard2.0\emu-help-v3.dll .\lib\Standalone\emu-help-v3.dll
 
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
