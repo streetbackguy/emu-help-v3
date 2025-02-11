@@ -1,10 +1,10 @@
 ﻿using EmuHelp.HelperBase;
 using EmuHelp.Logging;
+using EmuHelp.Systems.GCN;
 using EmuHelp.Systems.Wii;
 using EmuHelp.Systems.Wii.Emulators;
 using JHelper.Common.MemoryUtils;
 using System;
-using System.Buffers;
 using System.Runtime.InteropServices;
 
 public class Wii : WII { }
@@ -81,44 +81,41 @@ public class WII : HelperBase
 
     public override bool TryRead<T>(out T value, ulong address, params int[] offsets)
     {
-        value = default;
-
         if (emulatorProcess is null || Wiiemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
-            return false;
-
-        int t_size = Marshal.SizeOf<T>();
-
-        byte[]? rented = null;
-        Span<byte> buffer = t_size <= 1024
-            ? stackalloc byte[t_size]
-            : (rented = ArrayPool<byte>.Shared.Rent(t_size));
-
-        bool success = emulatorProcess.ReadArray(realAddress, buffer);
-
-        if (!success)
         {
-            if (rented is not null)
-                ArrayPool<byte>.Shared.Return(rented);
+            value = default;
             return false;
         }
 
-        if (Wiiemulator.Endianness == Endianness.Big)
-            buffer.Reverse();
+        return Wiiemulator.Endianness == Endianness.Big
+            ? emulatorProcess.ReadBigEndian(realAddress, out value)
+            : emulatorProcess.Read(realAddress, out value);
+    }
 
-        unsafe
+    protected override bool ResolvePath(out IntPtr finalAddress, ulong baseAddress, params int[] offsets)
+    {
+        // Check if the emulator process is valid and retrieve the real address for the base address
+        if (emulatorProcess is null || Wiiemulator is null || !TryGetRealAddress(baseAddress, out finalAddress))
         {
-            fixed (byte* ptr = buffer)
-            {
-                value = *(T*)ptr;
-            }
+            finalAddress = default;
+            return false;
         }
 
-        if (rented is not null)
-            ArrayPool<byte>.Shared.Return(rented);
+        foreach (int offset in offsets)
+        {
+            uint tempAddress;
+
+            if (!(Wiiemulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadBigEndian(finalAddress, out tempAddress)
+                : emulatorProcess.Read(finalAddress, out tempAddress))
+                || !TryGetRealAddress((ulong)(tempAddress + offset), out finalAddress))
+                return false;
+        }
+
         return true;
     }
 
-    public override bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
+    public override unsafe bool TryReadArray<T>(out T[] value, uint size, ulong address, params int[] offsets)
     {
         if (emulatorProcess is null || Wiiemulator is null || !ResolvePath(out IntPtr realAddress, address, offsets))
         {
@@ -126,35 +123,19 @@ public class WII : HelperBase
             return false;
         }
 
-        int t_size = (int)size * Marshal.SizeOf<T>();
-
-        byte[]? rented = null;
-        Span<byte> buffer = t_size <= 1024
-            ? stackalloc byte[t_size]
-            : (rented = ArrayPool<byte>.Shared.Rent(t_size));
-
-        bool success = emulatorProcess.ReadArray(realAddress, buffer);
-
-        if (!success)
+        using (ArrayRental<T> buffer = (int)size * sizeof(T) <= 1024 ? new(stackalloc T[(int)size]) : new((int)size))
         {
-            value = new T[size];
-            if (rented is not null)
-                ArrayPool<byte>.Shared.Return(rented);
-            return false;
+            if (!(Wiiemulator.Endianness == Endianness.Big
+                ? emulatorProcess.ReadArrayBigEndian(realAddress, buffer.Span)
+                : emulatorProcess.ReadArray(realAddress, buffer.Span)))
+            {
+                value = new T[(int)size];
+                return false;
+            }
+
+            value = buffer.Span.ToArray();
         }
 
-        if (Wiiemulator.Endianness == Endianness.Big)
-        {
-            int s = Marshal.SizeOf<T>();
-            for (int i = 0; i < size; i++)
-                buffer[(s * i)..(s * (i + 1))].Reverse();
-        }
-
-        Span<T> newBuf = MemoryMarshal.Cast<byte, T>(buffer);
-        value = newBuf[..(int)size].ToArray();
-        if (rented is not null)
-            ArrayPool<byte>.Shared.Return(rented);
         return true;
     }
-
 }
