@@ -57,7 +57,7 @@ public class PS2 : HelperBase
 
         if (address >= MINSIZE && address < MAXSIZE)
         {
-            realAddress = (IntPtr)((ulong)baseRam + address - MINSIZE);
+            realAddress = (IntPtr)((ulong)baseRam + address);
             return true;
         }
         return false;
