@@ -39,9 +39,10 @@ internal class Actions
     {
         get
         {
-            string? currentAction = new StackTrace()
-                    .GetFrames()
-                    .Reverse()
+            StackFrame[] frames = new StackTrace().GetFrames();
+            frames.Reverse();
+
+            string? currentAction = frames
                     .Select(frame =>
                     {
                         MethodBase method = frame.GetMethod();
