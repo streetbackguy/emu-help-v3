@@ -27,7 +27,7 @@ internal class Duckstation : PS1Emulator
         // Old Duckstation releases don't use debug symbols. In this case, we employ a dedicated signature scan
         else
         {
-            ramPointer = _process.MainModule.Scan(new MemoryScanPattern(3, "48 89 0D ?? ?? ?? ?? B8") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
+            ramPointer = _process.MainModule.Scan(new ScanPattern(3, "48 89 0D ?? ?? ?? ?? B8") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
             if (ramPointer == IntPtr.Zero)
                 return false;
         }

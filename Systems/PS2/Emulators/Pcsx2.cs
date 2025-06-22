@@ -25,13 +25,13 @@ internal class Pcsx2 : PS2Emulator
 
         if (_process.Is64Bit)
         {
-            addr_base = _process.Scan(new MemoryScanPattern(3, "48 8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
+            addr_base = _process.Scan(new ScanPattern(3, "48 8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
             if (addr_base == IntPtr.Zero)
                 return false;
         }
         else
         {
-            addr_base = new MemoryScanPattern[]
+            addr_base = new ScanPattern[]
             {
                 new(2, "8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = _process.ReadPointer },
                 new(2, "8B ?? ?? ?? ?? ?? 81 ?? F0 3F 00 00") { OnFound = _process.ReadPointer },

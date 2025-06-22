@@ -20,7 +20,7 @@ internal class PCSXRedux : PS1Emulator
         if (!_process.Is64Bit)
             return false;
 
-        IntPtr addr = _process.Scan(new MemoryScanPattern(3, "48 8B 05 ?? ?? ?? ?? 48 8B 80 ?? ?? ?? ?? 48 8B 50 ?? E8"));
+        IntPtr addr = _process.Scan(new ScanPattern(3, "48 8B 05 ?? ?? ?? ?? 48 8B 80 ?? ?? ?? ?? 48 8B 50 ?? E8"));
         if (addr == IntPtr.Zero)
             return false;
 
