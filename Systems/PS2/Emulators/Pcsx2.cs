@@ -17,15 +17,17 @@ internal class Pcsx2 : PS2Emulator
 
     public override bool FindRAM(ProcessMemory _process)
     {
+        if (_process.MainModule.Symbols.TryGetValue("EEmem", out IntPtr symbol))
+        {
+            addr_base = symbol;
+            return true;
+        }
+
         if (_process.Is64Bit)
         {
             addr_base = _process.Scan(new MemoryScanPattern(3, "48 8B ?? ?? ?? ?? ?? 25 F0 3F 00 00") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) });
             if (addr_base == IntPtr.Zero)
                 return false;
-
-            if (!_process.Read(addr_base, out IntPtr ptr))
-                return false;
-            RamBase = ptr;
         }
         else
         {
@@ -38,23 +40,25 @@ internal class Pcsx2 : PS2Emulator
 
             if (addr_base == IntPtr.Zero)
                 return false;
-
-            if (!_process.Read(addr_base, out IntPtr ptr))
-                return false;
-            RamBase = ptr;
         }
 
-        if (RamBase != IntPtr.Zero)
+        if (_process.Read(addr_base, out IntPtr ptr))
+        {
+            RamBase = ptr;
             Log.Info($"  => RAM address found at 0x{RamBase.ToString("X")}");
+        }
+        else
+        {
+            RamBase = IntPtr.Zero;
+            Log.Info($"  => RAM address unavailable at this moment, but it will be evaluated dynamically");
+        }
+
         return true;
     }
 
     public override bool KeepAlive(ProcessMemory process)
     {
-        if (!process.Read(addr_base, out IntPtr ptr))
-            return false;
-        RamBase = ptr;
-
+        RamBase = process.ReadPointer(addr_base);
         return true;
     }
 }
