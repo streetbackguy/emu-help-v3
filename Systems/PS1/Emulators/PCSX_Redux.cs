@@ -29,7 +29,7 @@ internal class PCSXRedux : PS1Emulator
 
         baseAddress = addr + 0x4 + addri;
 
-        if (_process.Read(addr + 7, out int offset1) || _process.Read(addr + 14, out byte offset2))
+        if (!_process.Read(addr + 7, out int offset1) || !_process.Read(addr + 14, out byte offset2))
             return false;
         offsets = [ offset1, offset2, 0 ];
 
