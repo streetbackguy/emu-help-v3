@@ -20,7 +20,7 @@ public class PSP : HelperBase
     // More documentation is available at https://github.com/hrydgard/ppsspp/blob/20e88679a0d21175f91cda238d3fd5918506950a/Core/MemMap.h
 
     private const uint MINSIZE = 0x08800000;
-    private const uint MAXSIZE = 0x0A000000;
+    private const uint MAXSIZE = 0x0C000000;
 
     private PSPEmulator? Pspemulator
     {
