@@ -46,6 +46,7 @@ public class PS1 : HelperBase
         "pcsx-redux.main",
         "XEBRA.EXE",
         "mednafen.exe",
+        "EmuHawk.exe",
     ];
 
     public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
@@ -82,6 +83,7 @@ public class PS1 : HelperBase
             "psxfin.exe" => new pSX(),
             "retroarch.exe" => new Retroarch(),
             "XEBRA.EXE" => new Xebra(),
+            "EmuHawk.exe" => new EmuHawk(),
             _ => null,
         };
     }
