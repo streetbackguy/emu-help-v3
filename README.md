@@ -12,7 +12,6 @@ Support is currently provided for the following systems:
 - Nintendo Game Boy Color
 - Nintendo GameCube
 - Nintendo Wii
-- Super Nintendo Entertainment System
 - Sega Master System
 - Sega Mega Drive / Sega Genesis
 - Sony PlayStation 1
