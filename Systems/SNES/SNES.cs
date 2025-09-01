@@ -1,78 +1,31 @@
-﻿using EmuHelp.HelperBase;
-using EmuHelp.Logging;
-using EmuHelp.Systems.SNES;
-using EmuHelp.Systems.SNES.Emulators;
+﻿using EmuHelp.Logging;
+using JHelper.Common.ProcessInterop;
 using System;
+using System.Linq;
 
-public class SuperNintendoEntertainmentSystem : SNES { }
+namespace EmuHelp.Systems.SNES.Emulators;
 
-public class SNES : HelperBase
+internal class SNES : SNESEmulator
 {
-    private const uint MINSIZE = 0xC000;
-    private const uint MAXSIZE = 0xE000;
-    private const uint MINSIZE_ALT = 0xE000;
-    private const uint MAXSIZE_ALT = 0x10000;
+    private const long RAM_SIZE = 0x101000; // 1 MB + 4 KB
 
-    private SNESEmulator? emulator
+    internal SNES()
     {
-        get => (SNESEmulator?)emulatorClass;
-        set => emulatorClass = value;
+        Log.Info("  => Attached to emulator: Snes9x");
     }
 
-    public SNES()
-#if LIVESPLIT
-        : this(true) { }
-
-    public SNES(bool generateCode)
-        : base(generateCode)
-#else
-        : base()
-#endif
+    public override bool FindRAM(ProcessMemory process)
     {
-        Log.Info("  => SNES - Helper started");
-    }
+        // Find a memory page of exactly RAM_SIZE
+        var ramPage = process.MemoryPages.FirstOrDefault(p => p.RegionSize == RAM_SIZE);
 
-    internal override string[] ProcessNames { get; } =
-    [
-        "retroarch.exe",
-        "snes9x-x64.exe",
-    ];
-
-    public override bool TryGetRealAddress(ulong address, out IntPtr realAddress)
-    {
-        realAddress = default;
-
-        if (emulator is null)
+        if (ramPage == null)
             return false;
 
-        IntPtr baseRam = emulator.RamBase;
-
-        if (baseRam == IntPtr.Zero)
-            return false;
-
-        if (address >= MINSIZE && address < MAXSIZE)
-        {
-            realAddress = (IntPtr)((ulong)baseRam + address - MINSIZE);
-            return true;
-        }
-        else if (address >= MINSIZE_ALT && address < MAXSIZE_ALT)
-        {
-            realAddress = (IntPtr)((ulong)baseRam + address - MINSIZE_ALT);
-            return true;
-        }
-        return false;
+        RamBase = ramPage.BaseAddress;
+        Log.Info($"  => RAM address found at 0x{RamBase:X}");
+        return true;
     }
 
-    internal override Emulator? AttachEmuClass()
-    {
-        if (emulatorProcess is null)
-            return null;
-
-        return emulatorProcess.ProcessName switch
-        {
-            "retroarch.exe" => new Retroarch(),
-            "snes9x-x64.exe" => new Snes9x(),
-            _ => null,
-        };
-    }
+    public override bool KeepAlive(ProcessMemory _) => true;
 }

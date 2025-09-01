@@ -7,57 +7,69 @@ namespace EmuHelp.Systems.SNES.Emulators;
 
 internal class Retroarch : SNESEmulator
 {
-    private IntPtr core_base_address;
+    private IntPtr coreBaseAddress;
 
     private readonly string[] supportedCores =
-    [
+    {
         "snes9x_libretro.dll",
         "snes9x2005_libretro.dll",
         "snes9x2010_libretro.dll",
         "mesen_libretro.dll",
-    ];
+    };
 
     internal Retroarch()
-        : base()
     {
         Log.Info("  => Attached to emulator: Retroarch");
     }
 
-    public override bool FindRAM(ProcessMemory _process)
+    public override bool FindRAM(ProcessMemory process)
     {
-        ProcessModule core = _process.Modules.FirstOrDefault(m => supportedCores.Contains(m.ModuleName));
-        if (core == default)
+        // Find the loaded core module
+        var core = process.Modules.FirstOrDefault(m => supportedCores.Contains(m.ModuleName));
+        if (core == null)
             return false;
 
-        core_base_address = core.BaseAddress;
+        coreBaseAddress = core.BaseAddress;
 
+        // Ensure the core has the symbol retro_get_memory_data
         if (!core.Symbols.TryGetValue("retro_get_memory_data", out IntPtr baseScanAddr))
             return false;
 
-
-        RamBase = _process.Is64Bit
+        // Scan memory starting from retro_get_memory_data to find the RAM base
+        RamBase = process.Is64Bit
             ? core.ModuleName switch
             {
-                "snes9x_libretro.dll" or "snes9x2005_libretro.dll" or "snes9x2010_libretro" => _process.Scan(new ScanPattern(1, "05 ?? ?? ?? ?? C3") { OnFound = addr => _process.DerefOffsets(addr + 0x4 + _process.Read<int>(addr), 0x0) }, baseScanAddr, 0x100),
-                "mesen_libretro.dll" => _process.Scan(new ScanPattern(3, "48 8D 05") { OnFound = addr => addr + 0x4 + _process.Read<int>(addr) }, baseScanAddr, 0x100),
+                "snes9x_libretro.dll" or "snes9x2005_libretro.dll" or "snes9x2010_libretro.dll" =>
+                    process.Scan(new ScanPattern(1, "05 ?? ?? ?? ?? C3")
+                    {
+                        OnFound = addr => process.DerefOffsets(addr + 0x4 + process.Read<int>(addr), 0x0)
+                    }, baseScanAddr, 0x100),
+                "mesen_libretro.dll" =>
+                    process.Scan(new ScanPattern(3, "48 8D 05")
+                    {
+                        OnFound = addr => addr + 0x4 + process.Read<int>(addr)
+                    }, baseScanAddr, 0x100),
                 _ => IntPtr.Zero,
             }
             : core.ModuleName switch
             {
-                "snes9x_libretro.dll" or "snes9x2005_libretro.dll" or "snes9x2010_libretro" => _process.Scan(new ScanPattern(1, "B8 ?? ?? ?? ?? BA") { OnFound = _process.ReadPointer }, baseScanAddr, 0x100),
-                "mesen_libretro.dll" => _process.Scan(new ScanPattern(1, "BA ?? ?? ?? ?? B8") { OnFound = _process.ReadPointer }, baseScanAddr, 0x100),
+                "snes9x_libretro.dll" or "snes9x2005_libretro.dll" or "snes9x2010_libretro.dll" =>
+                    process.Scan(new ScanPattern(1, "B8 ?? ?? ?? ?? BA") { OnFound = process.ReadPointer }, baseScanAddr, 0x100),
+                "mesen_libretro.dll" =>
+                    process.Scan(new ScanPattern(1, "BA ?? ?? ?? ?? B8") { OnFound = process.ReadPointer }, baseScanAddr, 0x100),
                 _ => IntPtr.Zero,
             };
 
         if (RamBase == IntPtr.Zero)
             return false;
 
-        Log.Info($"  => RAM address found at 0x{RamBase.ToString("X")}");
+        Log.Info($"  => RAM address found at 0x{RamBase:X}");
         return true;
     }
 
     public override bool KeepAlive(ProcessMemory process)
     {
-        return process.Read<byte>(core_base_address, out _);
+        // Simple check to see if the core module is still loaded
+        return process.Read<byte>(coreBaseAddress, out _);
     }
 }
