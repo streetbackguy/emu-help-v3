@@ -1,7 +1,8 @@
-﻿using System;
-using EmuHelp.Logging;
+﻿using EmuHelp.Logging;
 using JHelper.Common.MemoryUtils;
 using JHelper.Common.ProcessInterop;
+using System;
+using System.Linq;
 
 namespace EmuHelp.Systems.Xbox.Emulators;
 
@@ -14,33 +15,69 @@ internal class Xemu : XboxEmulator
         Log.Info("  => Attached to emulator: Xemu");
     }
 
+    private IntPtr? CachedRamBase = null;
+
     public override bool FindRAM(ProcessMemory process)
     {
         if (!process.Is64Bit)
             return false;
 
-        IntPtr addr = IntPtr.Zero;
+        IntPtr ramBaseCandidate = IntPtr.Zero;
 
-        // To identify the start of the emulated RAM, we can look for
-        // the PE header of the loaded .xex in memory.
-        for (int i = 32; i < 47; i++)
+        long maxAddress = 0x7FFFFFFFFFFF;
+        long step = 0x100000;
+        const int checkSize = 1024;
+        const double zeroThreshold = 0.9;
+
+        for (long addr = 0; addr < maxAddress; addr += step)
         {
-            IntPtr tempAddr = (nint)1 << i;
-            IntPtr baseModule = (IntPtr)((nint)tempAddr + 0x80000880);
+            IntPtr testAddr = new IntPtr(addr);
+            try
+            {
+                byte[] data = new byte[checkSize];
+                int zeroCount = 0;
+                bool readable = true;
 
-            if (process.Read(baseModule, out short val) && val == 0x5A4D
-                && process.Read(baseModule + 0x3C, out int e_lfanew)
-                && process.Read(baseModule + e_lfanew, out int pe) && pe == 0x4550)
-            { 
-                addr = tempAddr;
-                break;
+                for (int i = 0; i < checkSize; i++)
+                {
+                    if (!process.Read(new IntPtr(testAddr.ToInt64() + i), out byte value))
+                    {
+                        readable = false;
+                        break;
+                    }
+                    if (value == 0) zeroCount++;
+                }
+
+                if (!readable)
+                    continue;
+
+                double zeroRatio = (double)zeroCount / checkSize;
+                if (zeroRatio >= zeroThreshold)
+                {
+                    IntPtr writeTestAddr = new IntPtr(testAddr.ToInt64() + 0x1000);
+                    if (process.Read(writeTestAddr, out int original))
+                    {
+                        try { process.Write(writeTestAddr, original); }
+                        catch { continue; }
+                    }
+
+                    ramBaseCandidate = testAddr;
+                    break;
+                }
+            }
+            catch
+            {
+                continue;
             }
         }
-        if (addr == IntPtr.Zero)
+
+        if (ramBaseCandidate == IntPtr.Zero)
+        {
+            Log.Info("  => Could not find RAM base dynamically.");
             return false;
+        }
 
-        RamBase = addr;
-
+        RamBase = ramBaseCandidate;
         Log.Info($"  => RAM address mapped at 0x{RamBase.ToString("X")}");
         return true;
     }
