@@ -15,8 +15,6 @@ internal class Xemu : XboxEmulator
         Log.Info("  => Attached to emulator: Xemu");
     }
 
-    private IntPtr? CachedRamBase = null;
-
     public override bool FindRAM(ProcessMemory process)
     {
         if (!process.Is64Bit)
