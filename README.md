@@ -7,6 +7,7 @@ Its primary intended use case is in conjunction with a .asl script for LiveSplit
 
 Support is currently provided for the following systems:
 - Microsoft Xbox 360
+- Microsoft Xbox
 - Nintendo Game Boy Advance
 - Nintendo Game Boy Color
 - Nintendo GameCube
