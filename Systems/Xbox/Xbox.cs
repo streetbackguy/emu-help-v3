@@ -10,13 +10,6 @@ public class X : Xbox { }
 
 public class Xbox : HelperBase
 {
-    // Xbox 360s Memory Regions
-    // 0x30000000 - Heap Memory Region
-    // 0x40000000 - Allocated Data Memory Region
-    // 0x70000000 - the Stack Memory Region
-    // 0x82000000 - Basefiles Memory Region
-    // 0xC0000000 – 0xDFFFFFFF - Full 512mb Ram Memory Region
-
     private XboxEmulator? Xboxemulator
     {
         get => (XboxEmulator?)emulatorClass;
